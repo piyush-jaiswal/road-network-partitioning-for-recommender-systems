@@ -1,10 +1,12 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <algorithm>
 //#include "common.cpp"
 #include "haversine_distance.cpp"
 #define MAX_PARTITIONS 5
 #define BOUNDARY_RANGE 0.05
+#define DISTANCE_QUERY_LIMIT 24
 
 using namespace std;
 
@@ -14,6 +16,25 @@ typedef struct POIforUser
     Data utility;
     double distance;
 }selectedPOI;
+
+
+bool compareSelectedPOI(selectedPOI a, selectedPOI b)
+{
+    return a.distance < b.distance;
+}
+
+
+void applyRecommendationAlgo(vector<selectedPOI>& POIs, int k)
+{
+    int i;
+    sort(POIs.begin(), POIs.end(), compareSelectedPOI);
+
+    for(i = 0; i < k; i++)
+    {
+        cout << POIs[i].utility.utilities << endl;
+        cout << "Latitude: " << POIs[i].utility.coordinate.latitude << "\tLongitude: " << POIs[i].utility.coordinate.longitude << endl << endl;
+    }
+}
 
 
 // TO-DO, reduce this complexity
@@ -28,6 +49,54 @@ Map locateUserPartition(Point userLocation, vector<Map>& initialPartition)
             break;
     }
     return initialPartition[i];
+}
+
+
+// Finds the relevant POIs for the user in the partition
+vector<selectedPOI> findPOIs(Map partition, string POICategory)
+{
+    int low, high, comparision, tempPos, mid;
+    selectedPOI temp;
+    vector<selectedPOI> foundPOIs;
+
+    low = 0;
+    high = partition.noOfPOIs;
+
+    while(low + 1 != high)
+    {
+        mid = (low + high) / 2;
+        comparision = partition.utility[mid].utilities.compare(POICategory);
+
+        if (!comparision)
+        {
+            tempPos = mid;
+
+            // for the POIs lying in the current and above positions
+            while(tempPos >= 0 && partition.utility[tempPos].utilities.compare(POICategory))
+            {
+                temp.utility = partition.utility[tempPos];
+                temp.distance = -1;
+                foundPOIs.push_back(temp);
+                tempPos--;
+            }
+
+            // For dataRow lying below the mid position
+            tempPos = mid + 1;
+            while(tempPos < partition.noOfPOIs && partition.utility[tempPos].utilities.compare(POICategory))
+            {
+                temp.utility = partition.utility[tempPos];
+                temp.distance = -1;
+                foundPOIs.push_back(temp);
+                tempPos++;
+            }
+            return foundPOIs;
+        }
+
+        else if (comparision < 0)
+            low = mid;
+        else
+            high = mid;
+    }
 }
 
 
@@ -62,15 +131,46 @@ bool satisfiesBoundaryCase(Point userLocation, Map initialPartition)
 }
 
 
-// TO-DO: Change distance measure to actual road distance
-vector<Data>& find_K_NearestPOIs(Point userLocation, vector<Map>& initialPartition, int k)
+// adds the POIs in the partition to the total list of relelevant 'POIs'
+void addPOIs(Map partition, vector<selectedPOI>& POIs, string POICategory, Point userLocation)
 {
-    int i, j;
+    int prev, j = 0, l, tempPos;
+
+    vector<selectedPOI> userPOIs = findPOIs(partition, POICategory);
+        prev = j;
+        j += DISTANCE_QUERY_LIMIT;
+
+        while(j < userPOIs.size())
+        {
+            vector<selectedPOI> temp (userPOIs.begin() + prev, userPOIs.begin() + j);
+            vector<double> distance = get_distance(temp, userLocation);
+            tempPos = 0;
+
+            for(l = prev; l <j; l++)
+                userPOIs[l].distance = distance[tempPos++];
+
+            prev = j;
+            j += DISTANCE_QUERY_LIMIT;
+        }
+
+        vector<selectedPOI> temp (userPOIs.begin() + prev, userPOIs.end());
+        vector<double> distance = get_distance(temp, userLocation);
+        tempPos = 0;
+        for(l = prev; l < userPOIs.size(); l++)
+            userPOIs[l].distance = distance[tempPos++];
+        
+        POIs.insert(POIs.end(), userPOIs.begin(), userPOIs.end());
+}
+
+
+// TO-DO: Change distance measure to actual road distance
+vector<Data>& find_K_NearestPOIs(Point userLocation, vector<Map>& initialPartition, int k, string POICategory)
+{
+    int i, j = 0, l, prev, tempPos;
     Map userPartitions[MAX_PARTITIONS];
     vector<Map> acceptedPartitions, rejectedPartitions;
     vector<selectedPOI> POIs;
     selectedPOI tempSelectedPOI;
-    Map tempPartition;
     
     userPartitions[0] = locateUserPartition(userLocation, initialPartition);
     /*userPartitions[1] = topleftshift
@@ -86,32 +186,18 @@ vector<Data>& find_K_NearestPOIs(Point userLocation, vector<Map>& initialPartiti
             acceptedPartitions.push_back(userPartitions[i]);
     }
 
-    // Find POIs
+    // Find POIs in accepted partitions
     for(i = 0; i < acceptedPartitions.size(); i++)
-    {
-        tempPartition = acceptedPartitions[i];
+        addPOIs(acceptedPartitions[i], POIs, POICategory, userLocation);
 
-        for(j = 0; j < tempPartition.noOfPOIs; i++)
-        {
-            tempSelectedPOI.utility = tempPartition.utility[j];
-            tempSelectedPOI.distance = get_distance(userLocation, tempSelectedPOI.utility.coordinate);
-            POIs.push_back(tempSelectedPOI);
-        }
-    }
-
+    // If we do not have enough k then go in rejectedPartitions
     if(POIs.size() < k)
     {
         for(i = 0; i < rejectedPartitions.size(); i++)
         {
-            tempPartition = rejectedPartitions[i];
+            addPOIs(rejectedPartitions[i], POIs, POICategory, userLocation);
 
-            for(j = 0; j < tempPartition.noOfPOIs; i++)
-            {
-                tempSelectedPOI.utility = tempPartition.utility[j];
-                tempSelectedPOI.distance = get_distance(userLocation, tempSelectedPOI.utility.coordinate);
-                POIs.push_back(tempSelectedPOI);
-            }
-
+            // If k is exceeded, no need to look at other rejectedPartitions
             if(POIs.size() >= k)
                 break;
         }
@@ -125,13 +211,16 @@ vector<Data>& find_K_NearestPOIs(Point userLocation, vector<Map>& initialPartiti
 int main()
 {
     int k;
+    string POICategory;
     Point userLocation;
 
     cout << "Enter the query location." << endl;
     cin >> userLocation.latitude >> userLocation.longitude;
     cout << "Enter the no. of POIs wanted." << endl;
     cin >> k;
+    cout << "Enter the POI category" << endl;
+    cin >> POICategory;
 
-    //find_K_NearestPOIs(userLocation, k);
+    //find_K_NearestPOIs(userLocation, k, POICategory);
     return 0;
 }
