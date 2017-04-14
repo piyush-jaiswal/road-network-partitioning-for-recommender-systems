@@ -96,6 +96,15 @@ void initialize_box(Map *box, float factorLat, float factorLong, int boxSize, in
 }*/
 
 
+// Sort the array of POIs in a parititon according to the 'utility' string
+bool comparePOI(Data a, Data b)
+{   
+    if(a.utilities.compare(b.utilities) < 0)
+        return true;
+    return false;
+}
+
+
 // Assigns the POIs to their respective smaller partitions.
 void loadPoIs2(vector<Data>& dataRow, vector<Map>& smallerPartitions)
 {
@@ -139,9 +148,14 @@ void loadPoIs2(vector<Data>& dataRow, vector<Map>& smallerPartitions)
                         smallerPartitions[i].utility[posOfUtility++] = dataRow[tempPos];
                     tempPos++;
                 }
+
+                smallerPartitions[i].noOfPOIs = posOfUtility;
+                
+                // sort the POIs in partition
+                sort(smallerPartitions[i].utility, smallerPartitions[i].utility + smallerPartitions[i].noOfPOIs, comparePOI);
                 
                 stopBinarySearchFlag = 1;
-                cout << posOfUtility << " ";
+                //cout << posOfUtility << " ";
                 total += posOfUtility;
             }
 
@@ -152,7 +166,7 @@ void loadPoIs2(vector<Data>& dataRow, vector<Map>& smallerPartitions)
             }
         }
 
-    cout << "\ntotal = " << total << endl;
+    //cout << "\ntotal = " << total << endl;
 }
 
 
