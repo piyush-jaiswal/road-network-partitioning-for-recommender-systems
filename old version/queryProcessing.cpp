@@ -2,7 +2,8 @@
 #include <vector>
 #include <cmath>
 #include <algorithm>
-#include "haversine_and_partition.hpp"
+//#include "common.cpp"
+#include "haversine_distance.cpp"
 #define MAX_PARTITIONS 5
 #define BOUNDARY_RANGE 0.05
 #define DISTANCE_QUERY_LIMIT 24
