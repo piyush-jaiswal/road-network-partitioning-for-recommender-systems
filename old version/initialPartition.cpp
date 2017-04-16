@@ -35,8 +35,12 @@ void initial_partition(struct Map* box, float factorLat, float factorLong)
 
 
 // Set the coordinates of the smaller partitions.
-void initialize_box(Map *box, float factorLat, float factorLong, int boxSize, int totalPartitionInRow)
+void initialize_box(Map *box, int boxSize)
 {
+    int totalPartitionInRow = (int) sqrt(boxSize);
+    float factorLat = getfactorLat(latRange, totalPartitionInRow);
+    float factorLong = getfactorLong(longRange, totalPartitionInRow); 
+
     initial_partition(box, factorLat, factorLong);
     for(int i = 1; i < boxSize; i++)
     {
@@ -171,15 +175,19 @@ void loadPoIs2(vector<Data>& dataRow, vector<Map>& smallerPartitions)
 
 
 // For calculating the no of POIs in the dataset
-int getdatarowSize(ifstream &fin)
+int getdatarowSize()
 {
     int count = 0;
     string str;
+    ifstream fin("unique.csv");
+
     while(!fin.eof())
     {
         getline(fin,str);
         count++;
     }
+
+    fin.close();
     return count;
 }
 
@@ -217,6 +225,36 @@ bool operator<(const Data& a, const Data& b)
         return a.coordinate.latitude < b.coordinate.latitude;
     
     return a.coordinate.longitude < b.coordinate.longitude;
+}
+
+
+// Load the POIs in the data structures
+vector<Data> loadPOI_inDataStructures()
+{
+    string temp;
+    Data dataTemp;
+    ifstream file("unique.csv");
+    vector<Data> dataRow;
+
+    while(file.good())
+    {
+        getline(file, temp, ',');
+        if(temp.empty())
+            break;
+        dataTemp.venue_id = temp;
+        getline(file, dataTemp.venueCategory_id, ',');
+        getline(file, dataTemp.utilities, ',');
+        getline(file, temp, ',');
+        dataTemp.coordinate.latitude = atof(temp.c_str());
+        getline(file, temp);
+        dataTemp.coordinate.longitude = atof(temp.c_str());
+        dataRow.push_back(dataTemp);
+    }
+    file.close();
+    
+    // Sort dataRow
+    sort(dataRow.begin(), dataRow.end(), compareData);
+    return dataRow;
 }
 
 
