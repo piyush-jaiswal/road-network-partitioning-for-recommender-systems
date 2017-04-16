@@ -21,15 +21,78 @@ Map* getGrid(int noOfSmallerPartitions, int datarowSize)
 }
 
 
+// Top left shifted partitions
+vector<Map> topLeftShift(int noOfSmallerPartitions, int datarowSize, float factorLat, float factorLong)
+{
+    float topLeftPartition_lat, topLeftPartition_long;
+    Map *topLeftGrid;
+
+    topLeftPartition_lat = TOP_LEFT_LAT + BOUNDARY_RANGE * factorLat;
+    topLeftPartition_long = TOP_LEFT_LONG - BOUNDARY_RANGE * factorLong;
+    topLeftGrid = getGrid(noOfSmallerPartitions, datarowSize);
+    initialize_grid(topLeftGrid, noOfSmallerPartitions, topLeftPartition_lat, topLeftPartition_long);
+    vector<Map> topLeftShifted_vec (topLeftGrid, topLeftGrid + noOfSmallerPartitions);
+
+    return topLeftShifted_vec;
+}
+
+
+// Top right shifted partitions
+vector<Map> topRightShift(int noOfSmallerPartitions, int datarowSize, float factorLat, float factorLong)
+{
+    float topRightPartition_lat, topRightPartition_long;
+    Map *topRightGrid;
+
+    topRightPartition_lat = TOP_LEFT_LAT + BOUNDARY_RANGE * factorLat;
+    topRightPartition_long = TOP_LEFT_LONG + BOUNDARY_RANGE * factorLong;
+    topRightGrid = getGrid(noOfSmallerPartitions, datarowSize);
+    initialize_grid(topRightGrid, noOfSmallerPartitions, topRightPartition_lat, topRightPartition_long);
+    vector<Map> topRightShifted_vec (topRightGrid, topRightGrid + noOfSmallerPartitions);
+
+    return topRightShifted_vec;
+}
+
+
+// Bottom left shifted partitions
+vector<Map> bottomLeftShift(int noOfSmallerPartitions, int datarowSize, float factorLat, float factorLong)
+{
+    float bottomLeftPartition_lat, bottomLeftPartition_long;
+    Map *bottomLeftGrid;
+
+    bottomLeftPartition_lat = TOP_LEFT_LAT - BOUNDARY_RANGE * factorLat;
+    bottomLeftPartition_long = TOP_LEFT_LONG - BOUNDARY_RANGE * factorLong;
+    bottomLeftGrid = getGrid(noOfSmallerPartitions, datarowSize);
+    initialize_grid(bottomLeftGrid, noOfSmallerPartitions, bottomLeftPartition_lat, bottomLeftPartition_long);
+    vector<Map> bottomLeftShifted_vec (bottomLeftGrid, bottomLeftGrid + noOfSmallerPartitions);
+
+    return bottomLeftShifted_vec;
+}
+
+
+// Bottom right shifted partitions
+vector<Map> bottomRightShift(int noOfSmallerPartitions, int datarowSize, float factorLat, float factorLong)
+{
+    float bottomRightPartition_lat, bottomRightPartition_long;
+    Map *bottomRightGrid;
+
+    bottomRightPartition_lat = TOP_LEFT_LAT - BOUNDARY_RANGE * factorLat;
+    bottomRightPartition_long = TOP_LEFT_LONG + BOUNDARY_RANGE * factorLong;
+    bottomRightGrid = getGrid(noOfSmallerPartitions, datarowSize);
+    initialize_grid(bottomRightGrid, noOfSmallerPartitions, bottomRightPartition_lat, bottomRightPartition_long);
+    vector<Map> bottomRightShifted_vec (bottomRightGrid, bottomRightGrid + noOfSmallerPartitions);
+
+    return bottomRightShifted_vec;
+}
+
+
 int main()
 {
     int noOfSmallerPartitions, totalPartitionInRow, datarowSize, i, k;
-    float factorLat, factorLong, topLeftPartition_lat, topLeftPartition_long, topRightPartition_lat, topRightPartition_long, 
-          bottomLeftPartition_lat, bottomLeftPartition_long, bottomRightPartition_lat, bottomRightPartition_long;
+    float factorLat, factorLong, topLeftPartition_lat;
     string POICategory;
     vector<Data> dataRow;
     Point userLocation;
-    Map *originalGrid, *topLeftGrid, *topRightGrid, *bottomLeftGrid, *bottomRightGrid;
+    Map *originalGrid;
 
     //Taking the number of boxes in initial partition by the user
     cout << "Enter the number of partitions :" << endl;
@@ -67,60 +130,40 @@ int main()
 
     // Create top-left shifted grid
     cout << "Shifting partitions in the top left direction" << endl;
-    topLeftPartition_lat = TOP_LEFT_LAT + BOUNDARY_RANGE * factorLat;
-    topLeftPartition_long = TOP_LEFT_LONG - BOUNDARY_RANGE * factorLong;
-    topLeftGrid = getGrid(noOfSmallerPartitions, datarowSize);
-    initialize_grid(topLeftGrid, noOfSmallerPartitions, topLeftPartition_lat, topLeftPartition_long);
+    vector<Map>topLeftShifted_vec = topLeftShift(noOfSmallerPartitions, datarowSize, factorLat, factorLong);
     cout << "Done." << endl;
-
     // Load the POIs in the partitions created in the top-left shifted grid
     cout << "Loading POIs for the top-left shifted grid inside the created partitions" << endl;
-    vector<Map> topLeftShifted_vec (topLeftGrid, topLeftGrid + noOfSmallerPartitions);
     loadPoIs(dataRow, topLeftShifted_vec);
     cout << "Successfully loaded." << endl << endl;
 
 
     // Create top-right shifted grid
     cout << "Shifting partitions in the top right direction" << endl;
-    topRightPartition_lat = TOP_LEFT_LAT + BOUNDARY_RANGE * factorLat;
-    topRightPartition_long = TOP_LEFT_LONG + BOUNDARY_RANGE * factorLong;
-    topRightGrid = getGrid(noOfSmallerPartitions, datarowSize);
-    initialize_grid(topRightGrid, noOfSmallerPartitions, topRightPartition_lat, topRightPartition_long);
+    vector<Map>topRightShifted_vec = topRightShift(noOfSmallerPartitions, datarowSize, factorLat, factorLong);
     cout << "Done." << endl;
-
     // Load the POIs in the partitions created in the top-right shifted grid
     cout << "Loading POIs for the top-left shifted grid inside the created partitions" << endl;
-    vector<Map> topRightShifted_vec (topRightGrid, topRightGrid + noOfSmallerPartitions);
     loadPoIs(dataRow, topRightShifted_vec);
     cout << "Successfully loaded." << endl << endl;
 
 
     // Create bottom-left shifted grid
     cout << "Shifting partitions in the bottom left direction" << endl;
-    bottomLeftPartition_lat = TOP_LEFT_LAT - BOUNDARY_RANGE * factorLat;
-    bottomLeftPartition_long = TOP_LEFT_LONG - BOUNDARY_RANGE * factorLong;
-    bottomLeftGrid = getGrid(noOfSmallerPartitions, datarowSize);
-    initialize_grid(bottomLeftGrid, noOfSmallerPartitions, bottomLeftPartition_lat, bottomLeftPartition_long);
+    vector<Map>bottomLeftShifted_vec = bottomLeftShift(noOfSmallerPartitions, datarowSize, factorLat, factorLong);
     cout << "Done." << endl;
-
     // Load the POIs in the partitions created in the bottom-left shifted grid
     cout << "Loading POIs for the bottom-left shifted grid inside the created partitions" << endl;
-    vector<Map> bottomLeftShifted_vec (bottomLeftGrid, bottomLeftGrid + noOfSmallerPartitions);
     loadPoIs(dataRow, bottomLeftShifted_vec);
     cout << "Successfully loaded." << endl << endl;
 
 
     // Create bottom-right shifted grid
     cout << "Shifting partitions in the bottom right direction" << endl;
-    bottomRightPartition_lat = TOP_LEFT_LAT - BOUNDARY_RANGE * factorLat;
-    bottomRightPartition_long = TOP_LEFT_LONG + BOUNDARY_RANGE * factorLong;
-    bottomRightGrid = getGrid(noOfSmallerPartitions, datarowSize);
-    initialize_grid(bottomRightGrid, noOfSmallerPartitions, bottomRightPartition_lat, bottomRightPartition_long);
+    vector<Map>bottomRightShifted_vec = bottomRightShift(noOfSmallerPartitions, datarowSize, factorLat, factorLong);
     cout << "Done." << endl;
-
     // Load the POIs in the partitions created in the bottom-right shifted grid
     cout << "Loading POIs for the bottom-right shifted grid inside the created partitions" << endl;
-    vector<Map> bottomRightShifted_vec (bottomRightGrid, bottomRightGrid + noOfSmallerPartitions);
     loadPoIs(dataRow, bottomRightShifted_vec);
     cout << "Successfully loaded." << endl << endl;
 
