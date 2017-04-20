@@ -103,37 +103,6 @@ vector<selectedPOI> findPOIs(Map partition, string POICategory)
 }
 
 
-// This uses haversine distance
-bool satisfiesBoundaryCase(Point userLocation, Map initialPartition)
-{
-    double averageDimension, latBoundaryRange, longBoundaryRange;
-    bool hasRightBoundaryCase, hasLeftBoundaryCase, hasTopBoundaryCase, hasBottomBoundaryCase;
-    Point temp;
-
-    // The range within which the user lies within the boundary.
-    // Separate for latitude and longitude because they are not exactly equal.
-    latBoundaryRange = distanceEarth(initialPartition.p_id.top_left, initialPartition.p_id.bottom_left) * BOUNDARY_RANGE;
-    longBoundaryRange = distanceEarth(initialPartition.p_id.top_right, initialPartition.p_id.top_left) * BOUNDARY_RANGE;
-
-    // Calculate the distances from the four boundaries using haversine_distance
-    temp.latitude = userLocation.latitude;
-    temp.longitude = initialPartition.p_id.top_right.longitude;
-    hasRightBoundaryCase = distanceEarth(userLocation, temp) < longBoundaryRange;
-
-    temp.longitude = initialPartition.p_id.top_left.longitude;
-    hasLeftBoundaryCase = distanceEarth(userLocation, temp) < longBoundaryRange;
-
-    temp.latitude = initialPartition.p_id.top_left.latitude;
-    temp.longitude = userLocation.longitude;
-    hasTopBoundaryCase = distanceEarth(userLocation, temp) < latBoundaryRange;
-
-    temp.latitude = initialPartition.p_id.bottom_left.latitude;
-    hasBottomBoundaryCase = distanceEarth(userLocation, temp) < latBoundaryRange;
-
-    return hasRightBoundaryCase | hasLeftBoundaryCase | hasTopBoundaryCase | hasBottomBoundaryCase;
-}
-
-
 // Adds the POIs in the 'partition' to the total list of relelevant 'POIs'
 void addPOIs(Map partition, vector<selectedPOI>& POIs, string POICategory, Point userLocation)
 {
@@ -166,8 +135,39 @@ void addPOIs(Map partition, vector<selectedPOI>& POIs, string POICategory, Point
 }
 
 
+// This uses haversine distance
+bool satisfiesBoundaryCase(Point userLocation, Map initialPartition)
+{
+    double averageDimension, latBoundaryRange, longBoundaryRange;
+    bool hasRightBoundaryCase, hasLeftBoundaryCase, hasTopBoundaryCase, hasBottomBoundaryCase;
+    Point temp;
+
+    // The range within which the user lies within the boundary.
+    // Separate for latitude and longitude because they are not exactly equal.
+    latBoundaryRange = distanceEarth(initialPartition.p_id.top_left, initialPartition.p_id.bottom_left) * BOUNDARY_RANGE;
+    longBoundaryRange = distanceEarth(initialPartition.p_id.top_right, initialPartition.p_id.top_left) * BOUNDARY_RANGE;
+
+    // Calculate the distances from the four boundaries using haversine_distance
+    temp.latitude = userLocation.latitude;
+    temp.longitude = initialPartition.p_id.top_right.longitude;
+    hasRightBoundaryCase = distanceEarth(userLocation, temp) < longBoundaryRange;
+
+    temp.longitude = initialPartition.p_id.top_left.longitude;
+    hasLeftBoundaryCase = distanceEarth(userLocation, temp) < longBoundaryRange;
+
+    temp.latitude = initialPartition.p_id.top_left.latitude;
+    temp.longitude = userLocation.longitude;
+    hasTopBoundaryCase = distanceEarth(userLocation, temp) < latBoundaryRange;
+
+    temp.latitude = initialPartition.p_id.bottom_left.latitude;
+    hasBottomBoundaryCase = distanceEarth(userLocation, temp) < latBoundaryRange;
+
+    return hasRightBoundaryCase | hasLeftBoundaryCase | hasTopBoundaryCase | hasBottomBoundaryCase;
+}
+
+
 // TO-DO: Change distance measure to actual road distance
-vector<Data>& find_K_NearestPOIs(Point userLocation, vector<Map> originalGrid,  vector<Map> topLeftGrid,  vector<Map> topRightGrid,  
+void find_K_NearestPOIs(Point userLocation, vector<Map> originalGrid,  vector<Map> topLeftGrid,  vector<Map> topRightGrid,  
                                                                         vector<Map> bottomLeftGrid,  vector<Map> bottomRightGrid, int k, string POICategory)
 {
     int i, j = 0, l, prev, tempPos;
@@ -211,6 +211,16 @@ vector<Data>& find_K_NearestPOIs(Point userLocation, vector<Map> originalGrid,  
     }
 
     // TO-DO: implement applyRecommendationAlgo for finding the nearest distance;
+    applyRecommendationAlgo(POIs, k);
+}
+
+
+// Finding the POIs using brute force without creating any partitions
+void brute_force(Point userLocation, string POICategory, Map unPartitioned, int k)
+{
+    vector<selectedPOI> POIs;
+
+    addPOIs(unPartitioned, POIs, POICategory, userLocation);
     applyRecommendationAlgo(POIs, k);
 }
 

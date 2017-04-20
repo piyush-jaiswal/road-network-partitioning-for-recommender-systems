@@ -3,7 +3,40 @@
 #include "partitions_and_POIs.hpp"
 #include "partitioned_grids.hpp"
 
+// for brute_force
+#define TOP_LEFT_LAT 40.99
+#define TOP_LEFT_LONG -74.276
+#define LATITUDE_RANGE 0.442
+#define LONGITUDE_RANGE 0.595
+
 using namespace std;
+
+
+// To get the whole original grid as a single partition for applying brute force.
+Map get_brute_force_partition(vector<Data> dataRow)
+{
+    Map unPartitioned;
+    Point topLeft, topRight, bottomLeft, bottomRight;
+
+    topLeft.latitude = TOP_LEFT_LAT;
+    topLeft.longitude = TOP_LEFT_LONG;
+    topRight.latitude = TOP_LEFT_LAT;
+    topRight.longitude = TOP_LEFT_LONG + LONGITUDE_RANGE;
+    bottomLeft.latitude = TOP_LEFT_LAT - LATITUDE_RANGE;
+    bottomLeft.longitude = TOP_LEFT_LONG;
+    bottomRight.latitude = TOP_LEFT_LAT - LATITUDE_RANGE;
+    bottomRight.longitude = TOP_LEFT_LONG + LONGITUDE_RANGE;
+
+    unPartitioned.p_id.top_left = topLeft;
+    unPartitioned.p_id.top_right = topRight;
+    unPartitioned.p_id.bottom_left = bottomLeft;
+    unPartitioned.p_id.bottom_right = bottomRight;
+
+    unPartitioned.noOfPOIs = dataRow.size();
+    copy(dataRow.begin(), dataRow.end(), unPartitioned.utility);
+
+    return unPartitioned;
+}
 
 
 int main()
@@ -12,6 +45,7 @@ int main()
     float factorLat, factorLong;
     string POICategory;
     vector<Data> dataRow;
+    Map unpartitioned;
 
     //Taking the number of boxes in initial partition by the user
     cout << "Enter the number of partitions :" << endl;
@@ -83,7 +117,8 @@ int main()
     loadPoIs(dataRow, bottomRightShifted_vec);
     cout << "Successfully loaded." << endl << endl;
 
-
+    // Preprocessing for the brute_force
+   unpartitioned =  get_brute_force_partition(dataRow);
 
     /*// Not completed. Call the k nearest for the whole map and then for the partitions created.
     // Enter the query

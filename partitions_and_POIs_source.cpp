@@ -125,10 +125,10 @@ bool comparePOI(Data a, Data b)
 // Assigns the POIs to their respective smaller partitions.
 void loadPoIs(vector<Data>& dataRow, vector<Map>& smallerPartitions)
 {
-    int i, mid, low, high, tempPos, total = 0, stopBinarySearchFlag, posOfUtility;
+    int i, mid, low, high, tempPos, stopBinarySearchFlag, posOfUtility;
     Map tempPartition;
 
-    //cout << "\nInside new loadPOI" << endl;
+    //cout << "\nInside loadPOIs" << endl;
 
     for(i = 0; i < smallerPartitions.size(); i++)
     {
@@ -173,7 +173,7 @@ void loadPoIs(vector<Data>& dataRow, vector<Map>& smallerPartitions)
                 
                 stopBinarySearchFlag = 1;
                 //cout << posOfUtility << " ";
-                total += posOfUtility;
+                //total += posOfUtility;
             }
 
             else if(dataRow[mid].coordinate.longitude > tempPartition.p_id.top_right.longitude)
