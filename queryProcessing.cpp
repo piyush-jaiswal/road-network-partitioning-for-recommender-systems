@@ -38,16 +38,20 @@ void applyRecommendationAlgo(vector<selectedPOI>& POIs, int k)
 
 // TO-DO, reduce this complexity
 // Locates the smaller partition in which the user lies
-Map locateUserPartition(Point userLocation, vector<Map>& initialPartition)
+Map locateUserPartition(Point userLocation, vector<Map>& grid)
 {
     int i;
 
-    for(i = 0; i < initialPartition.size(); i++)
+    for(i = 0; i < grid.size(); i++)
     {
-        if(liesInPartition(initialPartition[i].p_id, userLocation))
-            break;
+        if(liesInPartition(grid[i].p_id, userLocation))
+            return grid[i];
     }
-    return initialPartition[i];
+
+    // If user does not lie in any partition in the grid
+    Map notFound;
+    notFound.noOfPOIs = -1;
+    return notFound;
 }
 
 
@@ -163,7 +167,8 @@ void addPOIs(Map partition, vector<selectedPOI>& POIs, string POICategory, Point
 
 
 // TO-DO: Change distance measure to actual road distance
-vector<Data>& find_K_NearestPOIs(Point userLocation, vector<Map>& initialPartition, int k, string POICategory)
+vector<Data>& find_K_NearestPOIs(Point userLocation, vector<Map> originalGrid,  vector<Map> topLeftGrid,  vector<Map> topRightGrid,  
+                                                                        vector<Map> bottomLeftGrid,  vector<Map> bottomRightGrid, int k, string POICategory)
 {
     int i, j = 0, l, prev, tempPos;
     Map userPartitions[MAX_PARTITIONS];
@@ -171,18 +176,21 @@ vector<Data>& find_K_NearestPOIs(Point userLocation, vector<Map>& initialPartiti
     vector<selectedPOI> POIs;
     selectedPOI tempSelectedPOI;
     
-    userPartitions[0] = locateUserPartition(userLocation, initialPartition);
-    /*userPartitions[1] = topleftshift
-    userPartitions[2] = toprightshift
-    userPartitions[3] = bottomleftshift
-    userPartitions[4] = bottomrightshift*/
+    userPartitions[0] = locateUserPartition(userLocation, originalGrid);
+    userPartitions[1] = locateUserPartition(userLocation, topLeftGrid);
+    userPartitions[2] = locateUserPartition(userLocation, topRightGrid);
+    userPartitions[3] = locateUserPartition(userLocation, bottomLeftGrid);
+    userPartitions[4] = locateUserPartition(userLocation, bottomRightGrid);
 
     for(i = 0; i < MAX_PARTITIONS; i++)
     {
-        if(satisfiesBoundaryCase(userLocation, userPartitions[i]))
-            rejectedPartitions.push_back(userPartitions[i]);
-        else
-            acceptedPartitions.push_back(userPartitions[i]);
+        if(userPartitions[i].noOfPOIs > 0)
+        {
+            if(satisfiesBoundaryCase(userLocation, userPartitions[i]))
+                rejectedPartitions.push_back(userPartitions[i]);
+            else
+                acceptedPartitions.push_back(userPartitions[i]);
+        }
     }
 
     // Find POIs in accepted partitions
