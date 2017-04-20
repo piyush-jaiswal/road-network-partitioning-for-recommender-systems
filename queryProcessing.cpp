@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <fstream>
 #include <algorithm>
 #include "haversine_and_partition.hpp"
 #define MAX_PARTITIONS 5
