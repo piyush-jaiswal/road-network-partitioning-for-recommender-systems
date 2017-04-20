@@ -18,6 +18,7 @@ typedef struct POIforUser
 }selectedPOI;
 
 
+
 bool compareSelectedPOI(selectedPOI a, selectedPOI b)
 {
     return a.distance < b.distance;
