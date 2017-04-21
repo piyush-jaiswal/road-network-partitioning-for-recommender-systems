@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+//Added string library
+#include <string>
 #include <fstream>
 #include <algorithm>
 #include "haversine_and_partition.hpp"
@@ -37,6 +39,43 @@ void applyRecommendationAlgo(vector<selectedPOI>& POIs, int k)
     }
 }
 
+//writing the poi coordinates to file
+void writeCoordinatesToFile(vector <selectedPOI> temp)
+{
+    ofstream fout;
+    fout.open("coordinates.txt");
+    vector <selectedPOI> :: iterator it;
+    for(it = temp.begin(); it != temp.end(); it++)
+    {
+        fout << *it.utility.latitude << "," << *it.utility.longitude << endl;
+    }
+}
+
+//writing userLocation to file
+//TODO : Improve this writing
+void writeUserCoordinatesToFile(Point userLocation)
+{
+    ofstream fo;
+    fo.open("userpoint.txt");
+    fo << userLocation.latitude << "," << userLocation.longitude << end;
+}
+
+//Getting the distance vector from js file
+vector get_distance(vector <selectedPOI> temp, Point userLocation)
+{
+    writeCoordinatesToFile(temp);
+    writeUserCoordinatesToFile(userLocation);
+    vector <double> distanceVector;
+    ifstream fin;
+    string str;
+    fin.open("Disances.txt");
+    while(!fin.eof())
+    {
+        getline(fin,str);
+        distanceVector.push_back(stod(str));
+    }
+    return distanceVector;
+}
 
 // TO-DO, reduce this complexity
 // Locates the smaller partition in which the user lies

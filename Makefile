@@ -1,4 +1,4 @@
-compiler = g++
+compiler = g++ -std=c++11
 warning_flags = -Wall -Werror
 object_flag = -c
 executable_flag = -o
