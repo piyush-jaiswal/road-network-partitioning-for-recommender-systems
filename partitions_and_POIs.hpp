@@ -11,6 +11,7 @@ extern int getNoOfPOIs();
 extern std::vector<Data> loadPOI_inDataStructures();
 extern float getfactorLat(int);
 extern float getfactorLong(int);
-extern std::vector<Data>& find_K_NearestPOIs(Point, std::vector<Map>&, int, std::string);
+extern void find_K_NearestPOIs(Point, std::vector<Map>&, std::vector<Map>&, std::vector<Map>&, std::vector<Map>&, std::vector<Map>&, int , std::string);
+
 
 #endif // !partitions_and_POIs_H
