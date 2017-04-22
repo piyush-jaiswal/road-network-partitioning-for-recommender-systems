@@ -11,7 +11,7 @@ var start = 0;
 var destinations = [];
 var originUrl = [];
 //reading origin from file where exactly the user lies.
-fs1.readFile('userPoint.txt', 'utf8', function(err, data) {
+fs1.readFile('userpoint.txt', 'utf8', function(err, data) {
 
     if (err) {
         return console.log(err);
@@ -73,7 +73,7 @@ fs1.readFile('userPoint.txt', 'utf8', function(err, data) {
                     });
                     response.on("end", function() {
                         var distanceObj = JSON.parse(responseStr);
-                        console.log(distanceObj.rows[0].elements);
+                        //console.log(distanceObj.rows[0].elements);
 
                         distanceObj = distanceObj.rows[0].elements;
                         var resultStr = "";
@@ -88,7 +88,7 @@ fs1.readFile('userPoint.txt', 'utf8', function(err, data) {
                             if (err) {
                                 console.log("Unable to write to file.\n")
                             }
-                            console.log("Success");
+                            console.log("Success sent from js file");
                         });
 
                     })

@@ -32,28 +32,29 @@ void applyRecommendationAlgo(vector<selectedPOI> POIs, int k)
     int i;
     sort(POIs.begin(), POIs.end(), compareSelectedPOI);
 
-    cout << POIs.size() << endl;
+    //cout << POIs.size() << endl;
 
     for(i = 0; i < min(k, (int) POIs.size()); i++)
     {
-        cout << POIs[i].utility.utilities << endl;
-        cout << "Latitude: " << POIs[i].utility.coordinate.latitude << "\tLongitude: " << POIs[i].utility.coordinate.longitude << endl;
-        cout << "Distance from user = " << POIs[i].distance << endl << endl; 
+        // cout << POIs[i].utility.utilities << endl;
+        // cout << "Latitude: " << POIs[i].utility.coordinate.latitude << "\tLongitude: " << POIs[i].utility.coordinate.longitude << endl;
+        // cout << "Distance from user = " << POIs[i].distance << endl << endl; 
     }
 }
 
 //writing the poi coordinates to file
-void writeCoordinatesToFile(vector <selectedPOI> wantedPOI)
+void writeCoordinatesToFile(vector <selectedPOI> &wantedPOI)
 {
     int i, wantedPOISize;
     ofstream fout;
     fout.open("coordinates.txt", ios::trunc);
+    //cout << wantedPOI[i].utility.coordinate.latitude << "," << wantedPOI[i].utility.coordinate.longitude
 
     wantedPOISize = wantedPOI.size();
     for(i = 0; i < wantedPOISize; i++)
     {
         fout << wantedPOI[i].utility.coordinate.latitude << "," << wantedPOI[i].utility.coordinate.longitude << endl;
-        cout << wantedPOI[i].utility.coordinate.latitude << "," << wantedPOI[i].utility.coordinate.longitude << endl;
+        //cout << wantedPOI[i].utility.coordinate.latitude << "," << wantedPOI[i].utility.coordinate.longitude << endl;
     }
 
     fout.close();
@@ -67,12 +68,13 @@ void writeUserCoordinatesToFile(Point userLocation)
 {
     ofstream fo;
     fo.open("userpoint.txt", ios::trunc);
+    //cout << "hihihi";
     fo << userLocation.latitude << "," << userLocation.longitude << endl;
     fo.close();
 }
 
 //Getting the distance vector from js file
-vector <double> get_distance(vector <selectedPOI> temp, Point userLocation)
+vector <double> get_distance(vector <selectedPOI> &temp, Point userLocation)
 {
     vector<double> x;
     writeCoordinatesToFile(temp);
@@ -80,11 +82,12 @@ vector <double> get_distance(vector <selectedPOI> temp, Point userLocation)
     vector <double> distanceVector;
     ifstream fin;
     string str;
-    fin.open("Disances.txt");
+    fin.open("distances.txt");
     while(!fin.eof())
     {
         getline(fin,str);
-        distanceVector.push_back(stod(str));
+        if(str != "")
+            distanceVector.push_back(stod(str));
     }
     return distanceVector;
     //return x;
@@ -111,7 +114,27 @@ Map locateUserPartition(Point userLocation, vector<Map>& grid)
 // Finds the relevant POIs for the user in the partition
 vector<selectedPOI> findPOIs(Map partition, string POICategory)
 {
-    int low, high, comparision, tempPos, mid;
+    //Doing linear search
+    int i;
+     vector<selectedPOI> foundPOIs;
+     selectedPOI temp;
+     
+    int n = partition.noOfPOIs;
+    //cout << "here: " << n << endl;
+    int count = 0;
+    for(i = 0; i < n; i++)
+    {
+        if(partition.utility[i].utilities == "Bar")
+        {
+            temp.utility = partition.utility[i];
+            count++;
+            temp.distance = -1;
+            foundPOIs.push_back(temp);
+        }
+    }
+    //cout << endl << "COunt: " << count << endl;
+    return foundPOIs;
+   /* int low, high, comparision, tempPos, mid;
     selectedPOI temp;
     vector<selectedPOI> foundPOIs;
 
@@ -154,40 +177,55 @@ vector<selectedPOI> findPOIs(Map partition, string POICategory)
             high = mid;
     }
     //Added since error was occuring "non-return type error".
-    return foundPOIs;
+    return foundPOIs;*/
 }
 
 
 // Adds the POIs in the 'partition' to the total list of relelevant 'POIs'
 void addPOIs(Map partition, vector<selectedPOI>& POIs, string POICategory, Point userLocation)
 {
-    int prev, j = 0, l, tempPos, userPOIsSize;
-
+    int prev, j = 0, l, tempPos, userPOIsSize, i;
     vector<selectedPOI> userPOIs = findPOIs(partition, POICategory);
-        prev = j;
-        j += DISTANCE_QUERY_LIMIT;
-        userPOIsSize = userPOIs.size();
+    userPOIsSize = userPOIs.size();
+    
+    prev = j;
+    //vector <double> :: iterator it;
+    j += DISTANCE_QUERY_LIMIT;
+    
+    cout << endl << "size hai: " << userPOIsSize << endl;
+
 
         while(j < userPOIsSize)
         {
+            cout << "mohit is awesome" << endl;
             vector<selectedPOI> temp (userPOIs.begin() + prev, userPOIs.begin() + j);
-            
+            // cout << endl << "yha hai" << endl;
+            // cout << "size of temp " << temp.size() << endl;
             vector<double> distance = get_distance(temp, userLocation);
+            //cout << distance.size() << endl;
+            cout << endl << "yha hai" << endl; 
             tempPos = 0;
-
-            for(l = prev; l < j; l++)
+             for(l = prev; l < j; l++)
+            {
+                //cout << "check" << endl;
                 userPOIs[l].distance = distance[tempPos++];
-
+            }
+                
             prev = j;
             j += DISTANCE_QUERY_LIMIT;
         }
-
+         
         vector<selectedPOI> temp (userPOIs.begin() + prev, userPOIs.end());
         vector<double> distance = get_distance(temp, userLocation);
         tempPos = 0;
         for(l = prev; l < userPOIsSize; l++)
+        {
             userPOIs[l].distance = distance[tempPos++];
-        
+            //cout << "should not come here " << endl;
+        }
+        //cout << "printing distance size" << distance.size();
+         for(i = 0; i < userPOIsSize; i++)
+             cout << userPOIs[i].distance << endl;
         POIs.insert(POIs.end(), userPOIs.begin(), userPOIs.end());
 }
 
@@ -199,7 +237,6 @@ bool satisfiesBoundaryCase(Point userLocation, Map initialPartition)
     bool hasRightBoundaryCase, hasLeftBoundaryCase, hasTopBoundaryCase, hasBottomBoundaryCase;
     Point temp;
     
-
     // The range within which the user lies within the boundary.
     // Separate for latitude and longitude because they are not exactly equal.
     latBoundaryRange = distanceEarth(initialPartition.p_id.top_left, initialPartition.p_id.bottom_left) * BOUNDARY_RANGE;
@@ -254,25 +291,40 @@ void find_K_NearestPOIs(Point userLocation, vector<Map> &originalGrid,  vector<M
     // Find POIs in accepted partitions
     acceptedPartitionSize = acceptedPartitions.size();
     rejectedPartitionSize = rejectedPartitions.size();
-    for(i = 0; i < acceptedPartitionSize; i++)
-        addPOIs(acceptedPartitions[i], POIs, POICategory, userLocation);
+    //cout << "anshul: " << acceptedPartitionSize << "    " << rejectedPartitionSize << endl;
+    addPOIs(acceptedPartitions[0], POIs, POICategory, userLocation);
+//     for(i = 0; i < acceptedPartitionSize; i++)
+//     {
+//         addPOIs(acceptedPartitions[i], POIs, POICategory, userLocation);
+//         //cout << "ye to hoga";
+//     }
+// //        addPOIs(acceptedPartitions[i], POIs, POICategory, userLocation);
+//     // If we do not have enough k then go in rejectedPartitions
+//     poiSize = POIs.size();
+//     //cout << "pos anshul : " << poiSize << endl;
+//     if(poiSize < k)
+//     {
+//         for(i = 0; i < rejectedPartitionSize; i++)
+//         {
+//             addPOIs(rejectedPartitions[i], POIs, POICategory, userLocation);
+//             poiSize = POIs.size();
+//             // cout << "anshul is awesome" << POIs.size() <<  endl;
+//             // If k is exceeded, no need to look at other rejectedPartitions
+//             if(poiSize >= k){
+//                 cout << "break is working" << endl;
+//                 break;
+//             }
+//             // else if(poiSize < k)
+//             // {
+//             //     break;
+//             // }
+//         }
+//         //cout << "anshul is awesome" << endl;
 
-    // If we do not have enough k then go in rejectedPartitions
-    poiSize = POIs.size();
-    if(poiSize < k)
-    {
-        for(i = 0; i < rejectedPartitionSize; i++)
-        {
-            addPOIs(rejectedPartitions[i], POIs, POICategory, userLocation);
-
-            // If k is exceeded, no need to look at other rejectedPartitions
-            if(poiSize >= k)
-                break;
-        }
-    }
+//     }
 
     // TO-DO: implement applyRecommendationAlgo for finding the nearest distance;
-    applyRecommendationAlgo(POIs, k);
+   // applyRecommendationAlgo(POIs, k);
 }
 
 
