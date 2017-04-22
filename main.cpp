@@ -2,6 +2,7 @@
 #include <math.h>
 #include "partitions_and_POIs.hpp"
 #include "partitioned_grids.hpp"
+#include "data_structures.hpp"
 
 // for brute_force
 #define TOP_LEFT_LAT 40.99
@@ -41,11 +42,12 @@ Map get_brute_force_partition(vector<Data> dataRow)
 
 int main()
 {
-    int noOfSmallerPartitions, totalPartitionInRow, datarowSize;
+    int noOfSmallerPartitions, totalPartitionInRow, datarowSize, k;
     float factorLat, factorLong;
     string POICategory;
+    Point userLocation;
     vector<Data> dataRow;
-    Map unpartitioned;
+    //Map unpartitioned;
 
     //Taking the number of boxes in initial partition by the user
     cout << "Enter the number of partitions :" << endl;
@@ -118,15 +120,18 @@ int main()
     cout << "Successfully loaded." << endl << endl;
 
     // Preprocessing for the brute_force
-   unpartitioned =  get_brute_force_partition(dataRow);
+    //unpartitioned =  get_brute_force_partition(dataRow);
 
-    /*// Not completed. Call the k nearest for the whole map and then for the partitions created.
+    // Not completed. Call the k nearest for the whole map and then for the partitions created.
     // Enter the query
     cout << "Preprocessing complete. Waiting for query..." << endl;
     cin >> userLocation.latitude >> userLocation.longitude;
     cout << "Enter the POI category" << endl;
-    cin >> POICategory;
-    //find_K_NearestPOIs(userLocation, k, POICategory);*/
+    cin.ignore();
+    getline(cin, POICategory);
+    cout << "Enter the no. of POIs wanted." << endl;
+    cin >> k;
+    find_K_NearestPOIs(userLocation,initialPartition_vec, topLeftShifted_vec, topRightShifted_vec, bottomLeftShifted_vec, bottomRightShifted_vec, k, POICategory);
     
     return 0;
 }

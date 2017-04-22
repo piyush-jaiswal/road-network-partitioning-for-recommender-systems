@@ -15,3 +15,8 @@
 *.a.out
 *.gch
 *.vscode
+*.Makefile.swl
+*.Makefile.swm
+*.Makefile.swn
+*.Makefile.swo
+*.Makefile.swp
