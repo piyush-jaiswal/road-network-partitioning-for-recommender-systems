@@ -27,15 +27,18 @@ bool compareSelectedPOI(selectedPOI a, selectedPOI b)
 }
 
 
-void applyRecommendationAlgo(vector<selectedPOI>& POIs, int k)
+void applyRecommendationAlgo(vector<selectedPOI> POIs, int k)
 {
     int i;
     sort(POIs.begin(), POIs.end(), compareSelectedPOI);
 
-    for(i = 0; i < k; i++)
+    cout << POIs.size() << endl;
+
+    for(i = 0; i < min(k, (int) POIs.size()); i++)
     {
         cout << POIs[i].utility.utilities << endl;
-        cout << "Latitude: " << POIs[i].utility.coordinate.latitude << "\tLongitude: " << POIs[i].utility.coordinate.longitude << endl << endl;
+        cout << "Latitude: " << POIs[i].utility.coordinate.latitude << "\tLongitude: " << POIs[i].utility.coordinate.longitude << endl;
+        cout << "Distance from user = " << POIs[i].distance << endl << endl; 
     }
 }
 
@@ -44,11 +47,14 @@ void writeCoordinatesToFile(vector <selectedPOI> wantedPOI)
 {
     int i, wantedPOISize;
     ofstream fout;
-    fout.open("coordinates.txt");
+    fout.open("coordinates.txt", ios::trunc);
 
     wantedPOISize = wantedPOI.size();
     for(i = 0; i < wantedPOISize; i++)
+    {
         fout << wantedPOI[i].utility.coordinate.latitude << "," << wantedPOI[i].utility.coordinate.longitude << endl;
+        cout << wantedPOI[i].utility.coordinate.latitude << "," << wantedPOI[i].utility.coordinate.longitude << endl;
+    }
 
     fout.close();
     //This is awesome, it creates a pipe for seeking command line terminal from external program.
@@ -60,13 +66,15 @@ void writeCoordinatesToFile(vector <selectedPOI> wantedPOI)
 void writeUserCoordinatesToFile(Point userLocation)
 {
     ofstream fo;
-    fo.open("userpoint.txt");
+    fo.open("userpoint.txt", ios::trunc);
     fo << userLocation.latitude << "," << userLocation.longitude << endl;
+    fo.close();
 }
 
 //Getting the distance vector from js file
 vector <double> get_distance(vector <selectedPOI> temp, Point userLocation)
 {
+    vector<double> x;
     writeCoordinatesToFile(temp);
     writeUserCoordinatesToFile(userLocation);
     vector <double> distanceVector;
@@ -79,6 +87,7 @@ vector <double> get_distance(vector <selectedPOI> temp, Point userLocation)
         distanceVector.push_back(stod(str));
     }
     return distanceVector;
+    //return x;
 }
 
 // TO-DO, reduce this complexity

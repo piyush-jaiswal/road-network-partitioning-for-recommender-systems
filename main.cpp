@@ -34,7 +34,8 @@ Map get_brute_force_partition(vector<Data> dataRow)
     unPartitioned.p_id.bottom_right = bottomRight;
 
     unPartitioned.noOfPOIs = dataRow.size();
-    copy(dataRow.begin(), dataRow.end(), unPartitioned.utility);
+    unPartitioned.utility = &dataRow[0];
+    //copy(dataRow.begin(), dataRow.end(), unPartitioned.utility);
 
     return unPartitioned;
 }
