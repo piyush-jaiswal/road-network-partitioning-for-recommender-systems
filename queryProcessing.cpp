@@ -108,71 +108,56 @@ Map locateUserPartition(Point userLocation, vector<Map>& grid)
 // Finds the relevant POIs for the user in the partition
 vector<selectedPOI> findPOIs(Map partition, string POICategory)
 {
-    //Doing linear search
-     int i;
-     vector<selectedPOI> foundPOIs;
-     selectedPOI temp;
-
-    int n = partition.noOfPOIs;
-    int count = 0;
-    for(i = 0; i < n; i++)
+    vector<selectedPOI> foundPOIs;
+    int comparision, mid, low, high, tempPos, stopBinarySearchFlag;
+    selectedPOI temp;
+    low = 0;
+    high = partition.noOfPOIs;
+    stopBinarySearchFlag = 0;
+    
+    while(low <= high)
     {
-        if(partition.utility[i].utilities == POICategory)
+        if(stopBinarySearchFlag)
+            break;
+            
+        mid = (low + high) / 2;
+        comparision = partition.utility[mid].utilities.compare(POICategory);
+    
+        // If both the strings are equal
+        if (comparision == 0)
         {
-            temp.utility = partition.utility[i];
-            count++;
-            temp.distance = -1;
-            foundPOIs.push_back(temp);
+            tempPos = mid;
+    
+            // for the POIs lying in the current and below positions
+            while(tempPos >= 0 && !partition.utility[tempPos].utilities.compare(POICategory))
+            {
+                temp.utility = partition.utility[tempPos];
+                temp.distance = -1;
+                foundPOIs.push_back(temp);
+                tempPos--;
+            }
+    
+            // For dataRow lying above the mid position
+            tempPos = mid + 1;
+            while(tempPos < partition.noOfPOIs && !partition.utility[tempPos].utilities.compare(POICategory))
+            {
+                temp.utility = partition.utility[tempPos];
+                temp.distance = -1;
+                foundPOIs.push_back(temp);
+                tempPos++;
+            }
+
+            stopBinarySearchFlag = 1;
         }
-    }
+    
+        else if (comparision < 0)
+            low = mid + 1;
+        else
+            high = mid - 1;
+     }
+    //Added since error was occuring "non-return type error".
+    //cout << "reached end" << endl;
     return foundPOIs;
-
-    //TODO :to implement binary search
-
-    //cout << "k hai" << k;
-    // vector<selectedPOI> foundPOIs;
-    // int comparision, mid, low, high,tempPos;
-    // selectedPOI temp;
-    // low = 0;
-    // high = partition.noOfPOIs;
-    //
-    // while(low != high)
-    // {
-    //     mid = low + ((high-low) / 2);
-    //     comparision = partition.utility[mid].utilities.compare(POICategory);
-    //
-    //     if (comparision == 0)
-    //     {
-    //         tempPos = mid;
-    //
-    //         // for the POIs lying in the current and below positions
-    //         while(tempPos >= 0 && partition.utility[tempPos].utilities.compare(POICategory))
-    //         {
-    //             temp.utility = partition.utility[tempPos];
-    //             temp.distance = -1;
-    //             foundPOIs.push_back(temp);
-    //             tempPos--;
-    //         }
-    //
-    //         // For dataRow lying above the mid position
-    //         tempPos = mid + 1;
-    //         while(tempPos < partition.noOfPOIs && partition.utility[tempPos].utilities.compare(POICategory))
-    //         {
-    //             temp.utility = partition.utility[tempPos];
-    //             temp.distance = -1;
-    //             foundPOIs.push_back(temp);
-    //             tempPos++;
-    //         }
-    //     }
-    //
-    //     else if (comparision < 0)
-    //         high = mid-1;
-    //     else
-    //         low = mid+1;
-    //  }
-    // //Added since error was occuring "non-return type error".
-    // cout << "reached end" << endl;
-    // return foundPOIs;
 }
 
 
@@ -184,27 +169,15 @@ void addPOIs(Map partition, vector<selectedPOI>& POIs, string POICategory, Point
     userPOIsSize = userPOIs.size();
 
     prev = j;
-    //vector <double> :: iterator it;
     j += DISTANCE_QUERY_LIMIT;
-
-  //  cout << endl << "size hai: " << userPOIsSize << endl;
-
 
         while(j < userPOIsSize)
         {
-            //cout << "Entered while" << endl;
             vector<selectedPOI> temp (userPOIs.begin() + prev, userPOIs.begin() + j);
-            // cout << endl << "yha hai" << endl;
-            // cout << "size of temp " << temp.size() << endl;
             vector<double> distance = get_distance(temp, userLocation);
-            //cout << distance.size() << endl;
-            //cout << endl << "get_distance worked fine" << endl;
             tempPos = 0;
              for(l = prev; l < j; l++)
-            {
-                //cout << "check" << endl;
                 userPOIs[l].distance = distance[tempPos++];
-            }
 
             prev = j;
             j += DISTANCE_QUERY_LIMIT;
@@ -214,11 +187,8 @@ void addPOIs(Map partition, vector<selectedPOI>& POIs, string POICategory, Point
         vector<double> distance = get_distance(temp, userLocation);
         tempPos = 0;
         for(l = prev; l < userPOIsSize; l++)
-        {
             userPOIs[l].distance = distance[tempPos++];
-            //cout << "should not come here " << endl;
-        }
-        //cout << "printing distance size" << distance.size();
+
          for(i = 0; i < userPOIsSize; i++)
              cout << userPOIs[i].distance << endl;
         POIs.insert(POIs.end(), userPOIs.begin(), userPOIs.end());
@@ -286,11 +256,8 @@ void find_K_NearestPOIs(Point userLocation, vector<Map> &originalGrid,  vector<M
     acceptedPartitionSize = acceptedPartitions.size();
     rejectedPartitionSize = rejectedPartitions.size();
 
-    //addPOIs(acceptedPartitions[0], POIs, POICategory, userLocation);
     for(i = 0; i < acceptedPartitionSize; i++)
         addPOIs(acceptedPartitions[i], POIs, POICategory, userLocation);
-
-    //addPOIs(acceptedPartitions[i], POIs, POICategory, userLocation);
 
     // If we do not have enough k then go in rejectedPartitions
     poiSize = POIs.size();
@@ -307,7 +274,6 @@ void find_K_NearestPOIs(Point userLocation, vector<Map> &originalGrid,  vector<M
         }
     }
 
-    // TO-DO: implement applyRecommendationAlgo for finding the nearest distance;
     applyRecommendationAlgo(POIs, k);
 }
 

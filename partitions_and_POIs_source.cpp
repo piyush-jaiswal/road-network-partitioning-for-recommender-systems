@@ -137,7 +137,7 @@ void loadPoIs(vector<Data>& dataRow, vector<Map>& smallerPartitions)
         tempPartition = smallerPartitions[i];
         stopBinarySearchFlag = 0;
 
-        while(low + 1 != high)
+        while(low <= high)
         {
             if(stopBinarySearchFlag)
                 break;
@@ -177,9 +177,9 @@ void loadPoIs(vector<Data>& dataRow, vector<Map>& smallerPartitions)
             }
 
             else if(dataRow[mid].coordinate.longitude > tempPartition.p_id.top_right.longitude)
-                 high = mid;
+                 high = mid + 1;
             else
-                low = mid;
+                low = mid - 1;
             }
         }
 
