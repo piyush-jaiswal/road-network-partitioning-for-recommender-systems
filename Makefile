@@ -2,6 +2,7 @@ compiler = g++ -std=c++11
 warning_flags = -Wall -Werror
 object_flag = -c
 executable_flag = -o
+profile_flag = -pg
 source_files_object = partitions_and_POIs_source.o partitioned_grids_source.o haversine_distance_source.o queryProcessing.o
 
 guide:
@@ -10,8 +11,17 @@ guide:
 compile: $(source_files_object)
 	$(compiler) $(warning_flags) $(executable_flag) main main.cpp $(source_files_object)
 
+gprof: $(source_files_object)
+	$(compiler) $(profile_flag) $(warning_flags) $(executable_flag) main main.cpp $(source_files_object)
+
 run: compile main
 	./main < inp.txt
+
+run_gprof: gprof main
+	./main < inp.txt
+
+get_profile: main gmon.out
+	gprof main gmon.out
 
 partitions_and_POIs_source.o:
 	$(compiler) $(object_flag) partitions_and_POIs_source.cpp

@@ -48,7 +48,7 @@ int main()
     string POICategory;
     Point userLocation;
     vector<Data> dataRow;
-    //Map unpartitioned;
+    Map unpartitioned;
 
     //Taking the number of boxes in initial partition by the user
     cout << "Enter the number of partitions :" << endl;
@@ -121,9 +121,8 @@ int main()
     cout << "Successfully loaded." << endl << endl;
 
     // Preprocessing for the brute_force
-    //unpartitioned =  get_brute_force_partition(dataRow);
+    unpartitioned =  get_brute_force_partition(dataRow);
 
-    // Not completed. Call the k nearest for the whole map and then for the partitions created.
     // Enter the query
     cout << "Preprocessing complete. Waiting for query..." << endl;
     cin >> userLocation.latitude >> userLocation.longitude;
@@ -132,6 +131,8 @@ int main()
     getline(cin, POICategory);
     cout << "Enter the no. of POIs wanted." << endl;
     cin >> k;
+
+    //brute_force(userLocation, POICategory, unpartitioned, k);
     find_K_NearestPOIs(userLocation,initialPartition_vec, topLeftShifted_vec, topRightShifted_vec, bottomLeftShifted_vec, bottomRightShifted_vec, k, POICategory);
     
     return 0;

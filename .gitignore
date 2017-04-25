@@ -11,6 +11,7 @@
 ### Above combination will ignore all files without extension ###
 
 *.o
+*.out
 *.exe
 *.a.out
 *.gch

@@ -284,5 +284,9 @@ void brute_force(Point userLocation, string POICategory, Map unPartitioned, int 
     vector<selectedPOI> POIs;
 
     addPOIs(unPartitioned, POIs, POICategory, userLocation);
+    cout << endl << "Brute force recommendations" << endl;
     applyRecommendationAlgo(POIs, k);
 }
+
+
+// Function to measure accuracy
