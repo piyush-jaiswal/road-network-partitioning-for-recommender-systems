@@ -21,3 +21,5 @@
 *.Makefile.swn
 *.Makefile.swo
 *.Makefile.swp
+coordinates.txt
+distances.txt
