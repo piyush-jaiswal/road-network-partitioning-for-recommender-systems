@@ -266,7 +266,6 @@ void find_K_NearestPOIs(Point userLocation, vector<Map> &originalGrid,  vector<M
     Map userPartitions[MAX_PARTITIONS];
     vector<Map> acceptedPartitions, rejectedPartitions;
     vector<selectedPOI> POIs;
-    selectedPOI tempSelectedPOI;
 
     userPartitions[0] = locateUserPartition(userLocation, originalGrid);
     userPartitions[1] = locateUserPartition(userLocation, topLeftGrid);
@@ -322,4 +321,16 @@ void brute_force(Point userLocation, string POICategory, Map unPartitioned, int 
 }
 
 
-// Function to measure accuracy
+// GIve recommendations on just the original grid
+void originalGrid_recommendation(Point userLocation, string POICategory, vector<Map> originalGrid, int k)
+{
+    Map userPartition;
+    vector<selectedPOI> POIs;
+    
+     userPartition = locateUserPartition(userLocation, originalGrid);
+     if(userPartition.noOfPOIs > 0)
+            addPOIs(userPartition, POIs, POICategory, userLocation);
+
+    cout << endl << "Original grid partition recommendations" << endl;
+    applyRecommendationAlgo(POIs, k);
+}

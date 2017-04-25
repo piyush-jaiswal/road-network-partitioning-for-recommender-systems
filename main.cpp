@@ -48,8 +48,8 @@ Map get_brute_force_partition(vector<Data> dataRow)
 int main()
 {
     int noOfSmallerPartitions, totalPartitionInRow, datarowSize, k;
-    clock_t t1, t2;
-    double time_taken1, time_taken2;
+    clock_t t1, t2, t3;
+    double time_taken1, time_taken2, time_taken3;
     float factorLat, factorLong;
     string POICategory;
     Point userLocation;
@@ -142,13 +142,20 @@ int main()
     t1 = clock();
     brute_force(userLocation, POICategory, unpartitioned, k);
     t1 = clock() - t1;
-    time_taken1 = ((double)t1)/CLOCKS_PER_SEC;
-    cout << "our brute force took these many seconds to execute \n" << time_taken1<< endl;
+    time_taken1 = ((double)t1) / CLOCKS_PER_SEC;
+    cout << "Time taken by brute force: " << time_taken1<< endl;
 
     t2 = clock();
     find_K_NearestPOIs(userLocation,initialPartition_vec, topLeftShifted_vec, topRightShifted_vec, bottomLeftShifted_vec, bottomRightShifted_vec, k, POICategory);
     t2 = clock() - t2;
-    time_taken2 = ((double)t2)/CLOCKS_PER_SEC;
-    cout << "our apply recommendations took these many seconds to execute \n" << time_taken2 << endl;
+    time_taken2 = ((double)t2) / CLOCKS_PER_SEC;
+    cout << "Time taken by the entire recommendation algorithm: " << time_taken2 << endl;
+
+    t3 = clock();
+    originalGrid_recommendation(userLocation, POICategory, initialPartition_vec, k);
+    t3 = clock() - t3;
+    time_taken3 = ((double)t3) / CLOCKS_PER_SEC;
+    cout << "Time taken by the initial partition:  " << time_taken3 << endl;
+
     return 0;
 }
