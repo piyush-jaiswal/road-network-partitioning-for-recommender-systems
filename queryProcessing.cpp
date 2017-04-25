@@ -126,24 +126,24 @@ Map locateUserPartition(Point userLocation, vector<Map>& grid)
 // Finds the relevant POIs for the user in the partition
 vector<selectedPOI> findPOIs(Map partition, string POICategory)
 {
-  int i;
-   vector<selectedPOI> foundPOIs;
-   selectedPOI temp;
-
-  int n = partition.noOfPOIs;
-  int count = 0;
-  for(i = 0; i < n; i++)
-  {
-      if(partition.utility[i].utilities == POICategory)
-      {
-          temp.utility = partition.utility[i];
-          count++;
-          temp.distance = -1;
-          foundPOIs.push_back(temp);
-      }
-  }
-  return foundPOIs;
-    /*vector<selectedPOI> foundPOIs;
+  // int i;
+  //  vector<selectedPOI> foundPOIs;
+  //  selectedPOI temp;
+  //
+  // int n = partition.noOfPOIs;
+  // int count = 0;
+  // for(i = 0; i < n; i++)
+  // {
+  //     if(partition.utility[i].utilities == POICategory)
+  //     {
+  //         temp.utility = partition.utility[i];
+  //         count++;
+  //         temp.distance = -1;
+  //         foundPOIs.push_back(temp);
+  //     }
+  // }
+  // return foundPOIs;
+    vector<selectedPOI> foundPOIs;
     int comparision, mid, low, high, tempPos, stopBinarySearchFlag;
     selectedPOI temp;
     low = 0;
@@ -192,7 +192,7 @@ vector<selectedPOI> findPOIs(Map partition, string POICategory)
      }
     //Added since error was occuring "non-return type error".
     //cout << "reached end" << endl;
-    return foundPOIs;*/
+    return foundPOIs;
 }
 
 
