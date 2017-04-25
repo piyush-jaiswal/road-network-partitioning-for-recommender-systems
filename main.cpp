@@ -1,5 +1,7 @@
 #include <iostream>
+#include <time.h>
 #include <math.h>
+#include <algorithm>
 #include "partitions_and_POIs.hpp"
 #include "partitioned_grids.hpp"
 #include "data_structures.hpp"
@@ -34,8 +36,10 @@ Map get_brute_force_partition(vector<Data> dataRow)
     unPartitioned.p_id.bottom_right = bottomRight;
 
     unPartitioned.noOfPOIs = dataRow.size();
-    unPartitioned.utility = &dataRow[0];
-    //copy(dataRow.begin(), dataRow.end(), unPartitioned.utility);
+    unPartitioned.utility = new Data[unPartitioned.noOfPOIs];
+    copy(dataRow.begin(), dataRow.end(), &unPartitioned.utility[0]);
+    sort(unPartitioned.utility, unPartitioned.utility + unPartitioned.noOfPOIs, comparePOI);
+    //unPartitioned.utility = &dataRow[0];
 
     return unPartitioned;
 }
@@ -44,11 +48,13 @@ Map get_brute_force_partition(vector<Data> dataRow)
 int main()
 {
     int noOfSmallerPartitions, totalPartitionInRow, datarowSize, k;
+    clock_t t1, t2;
+    double time_taken1, time_taken2;
     float factorLat, factorLong;
     string POICategory;
     Point userLocation;
     vector<Data> dataRow;
-    //Map unpartitioned;
+    Map unpartitioned;
 
     //Taking the number of boxes in initial partition by the user
     cout << "Enter the number of partitions :" << endl;
@@ -121,9 +127,9 @@ int main()
     cout << "Successfully loaded." << endl << endl;
 
     // Preprocessing for the brute_force
-    //unpartitioned =  get_brute_force_partition(dataRow);
+    unpartitioned =  get_brute_force_partition(dataRow);
+    //cout << unpartitioned.utility[0].utilities << endl;
 
-    // Not completed. Call the k nearest for the whole map and then for the partitions created.
     // Enter the query
     cout << "Preprocessing complete. Waiting for query..." << endl;
     cin >> userLocation.latitude >> userLocation.longitude;
@@ -132,7 +138,17 @@ int main()
     getline(cin, POICategory);
     cout << "Enter the no. of POIs wanted." << endl;
     cin >> k;
+
+    t1 = clock();
+    brute_force(userLocation, POICategory, unpartitioned, k);
+    t1 = clock() - t1;
+    time_taken1 = ((double)t1)/CLOCKS_PER_SEC;
+    cout << "our brute force took these many seconds to execute \n" << time_taken1<< endl;
+
+    t2 = clock();
     find_K_NearestPOIs(userLocation,initialPartition_vec, topLeftShifted_vec, topRightShifted_vec, bottomLeftShifted_vec, bottomRightShifted_vec, k, POICategory);
-    
+    t2 = clock() - t2;
+    time_taken2 = ((double)t2)/CLOCKS_PER_SEC;
+    cout << "our apply recommendations took these many seconds to execute \n" << time_taken2 << endl;
     return 0;
 }

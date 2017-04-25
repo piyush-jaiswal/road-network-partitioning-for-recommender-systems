@@ -4,6 +4,8 @@
 #include <string>
 #include <fstream>
 #include <algorithm>
+#include <set>
+#include <iomanip>
 #include "data_structures.hpp"
 #include "haversine_and_partition.hpp"
 #define MAX_PARTITIONS 5
@@ -27,16 +29,32 @@ bool compareSelectedPOI(selectedPOI a, selectedPOI b)
 }
 
 
+// Comparision function to convert vector into set in order to remove duplicates.
+bool operator<(const selectedPOI& a, const selectedPOI& b)
+{
+    // if both have same longitude
+    if(a.utility.coordinate.longitude == b.utility.coordinate.longitude)
+        return a.utility.coordinate.latitude < b.utility.coordinate.latitude;
+
+    return a.utility.coordinate.longitude < b.utility.coordinate.longitude;
+}
+
+
 void applyRecommendationAlgo(vector<selectedPOI> POIs, int k)
 {
     int i, resultSize;
-    std::sort(POIs.begin(), POIs.end(), compareSelectedPOI);
-    resultSize = min(k, (int) (POIs.size()));
+    set<selectedPOI> temp(POIs.begin(), POIs.end());
+    vector<selectedPOI> unique(temp.begin(), temp.end());
+    sort(unique.begin(), unique.end(), compareSelectedPOI);
+    resultSize = min(k, (int) (unique.size()));
 
-    cout << "You have in total : " << resultSize << " " << POIs[0].utility.utilities << endl;
-    cout << "In increasing order of distance, they are at a distance of :";
+    cout << "You have in total : " <<  resultSize << endl;// << " " << POIs[0].utility.utilities << endl;
+    cout << "In increasing order of distance, they are at a distance of :" << endl;
     for(i = 0; i < resultSize; i++)
-      cout << POIs[i].distance << "km" << endl;
+    {
+      cout << setprecision(15) << unique[i].utility.coordinate.latitude << " " << setprecision(15) << unique[i].utility.coordinate.longitude << " ";
+      cout << setprecision(15) << unique[i].distance << "km" << endl;
+    }
 }
 
 //writing the poi coordinates to file
@@ -108,7 +126,24 @@ Map locateUserPartition(Point userLocation, vector<Map>& grid)
 // Finds the relevant POIs for the user in the partition
 vector<selectedPOI> findPOIs(Map partition, string POICategory)
 {
-    vector<selectedPOI> foundPOIs;
+  int i;
+   vector<selectedPOI> foundPOIs;
+   selectedPOI temp;
+
+  int n = partition.noOfPOIs;
+  int count = 0;
+  for(i = 0; i < n; i++)
+  {
+      if(partition.utility[i].utilities == POICategory)
+      {
+          temp.utility = partition.utility[i];
+          count++;
+          temp.distance = -1;
+          foundPOIs.push_back(temp);
+      }
+  }
+  return foundPOIs;
+    /*vector<selectedPOI> foundPOIs;
     int comparision, mid, low, high, tempPos, stopBinarySearchFlag;
     selectedPOI temp;
     low = 0;
@@ -157,7 +192,7 @@ vector<selectedPOI> findPOIs(Map partition, string POICategory)
      }
     //Added since error was occuring "non-return type error".
     //cout << "reached end" << endl;
-    return foundPOIs;
+    return foundPOIs;*/
 }
 
 
@@ -271,6 +306,7 @@ void find_K_NearestPOIs(Point userLocation, vector<Map> &originalGrid,  vector<M
               break;
         }
     }
+    cout << endl << "Partitioned recommendations" << endl;
     applyRecommendationAlgo(POIs, k);
 }
 
@@ -281,5 +317,9 @@ void brute_force(Point userLocation, string POICategory, Map unPartitioned, int 
     vector<selectedPOI> POIs;
 
     addPOIs(unPartitioned, POIs, POICategory, userLocation);
+    cout << endl << "Brute force recommendations" << endl;
     applyRecommendationAlgo(POIs, k);
 }
+
+
+// Function to measure accuracy
