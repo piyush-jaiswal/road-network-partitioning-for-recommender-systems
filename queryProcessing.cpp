@@ -114,20 +114,20 @@ vector<selectedPOI> findPOIs(Map partition, string POICategory)
     low = 0;
     high = partition.noOfPOIs;
     stopBinarySearchFlag = 0;
-    
+
     while(low <= high)
     {
         if(stopBinarySearchFlag)
             break;
-            
+
         mid = (low + high) / 2;
         comparision = partition.utility[mid].utilities.compare(POICategory);
-    
+
         // If both the strings are equal
         if (comparision == 0)
         {
             tempPos = mid;
-    
+
             // for the POIs lying in the current and below positions
             while(tempPos >= 0 && !partition.utility[tempPos].utilities.compare(POICategory))
             {
@@ -136,7 +136,7 @@ vector<selectedPOI> findPOIs(Map partition, string POICategory)
                 foundPOIs.push_back(temp);
                 tempPos--;
             }
-    
+
             // For dataRow lying above the mid position
             tempPos = mid + 1;
             while(tempPos < partition.noOfPOIs && !partition.utility[tempPos].utilities.compare(POICategory))
@@ -149,7 +149,7 @@ vector<selectedPOI> findPOIs(Map partition, string POICategory)
 
             stopBinarySearchFlag = 1;
         }
-    
+
         else if (comparision < 0)
             low = mid + 1;
         else
@@ -167,7 +167,6 @@ void addPOIs(Map partition, vector<selectedPOI>& POIs, string POICategory, Point
     int prev, j = 0, l, tempPos, userPOIsSize, i;
     vector<selectedPOI> userPOIs = findPOIs(partition, POICategory);
     userPOIsSize = userPOIs.size();
-
     prev = j;
     j += DISTANCE_QUERY_LIMIT;
 
@@ -193,7 +192,6 @@ void addPOIs(Map partition, vector<selectedPOI>& POIs, string POICategory, Point
              cout << userPOIs[i].distance << endl;
         POIs.insert(POIs.end(), userPOIs.begin(), userPOIs.end());
 }
-
 
 // This uses haversine distance
 bool satisfiesBoundaryCase(Point userLocation, Map initialPartition)
@@ -273,7 +271,6 @@ void find_K_NearestPOIs(Point userLocation, vector<Map> &originalGrid,  vector<M
               break;
         }
     }
-
     applyRecommendationAlgo(POIs, k);
 }
 
