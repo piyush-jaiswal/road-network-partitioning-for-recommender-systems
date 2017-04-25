@@ -2,6 +2,9 @@
 #include <time.h>
 #include <math.h>
 #include <algorithm>
+#include <stdlib.h>
+#include <time.h>
+#include <iomanip>
 #include "partitions_and_POIs.hpp"
 #include "partitioned_grids.hpp"
 #include "data_structures.hpp"
@@ -44,9 +47,22 @@ Map get_brute_force_partition(vector<Data> dataRow)
     return unPartitioned;
 }
 
+//Function to return randomly generated user points
+double getRandom(double min, double max)
+{
+    double before = rand() % (int)max + (int)min;
+    double after = (double)rand() / RAND_MAX;
+    double result = before + after;
+    if (result < min || result > max) {
+        result = getRandom(min, max);
+    }
+    return result;
+}
+
 
 int main()
 {
+    srand (time(NULL));
     int noOfSmallerPartitions, totalPartitionInRow, datarowSize, k;
     clock_t t1, t2, t3;
     double time_taken1, time_taken2, time_taken3;
@@ -132,7 +148,9 @@ int main()
 
     // Enter the query
     cout << "Preprocessing complete. Waiting for query..." << endl;
-    cin >> userLocation.latitude >> userLocation.longitude;
+    userLocation.latitude = getRandom(TOP_LEFT_LAT - LATITUDE_RANGE, TOP_LEFT_LAT);
+    userLocation.longitude = getRandom(TOP_LEFT_LONG, TOP_LEFT_LONG + LONGITUDE_RANGE);
+
     cout << "Enter the POI category" << endl;
     cin.ignore();
     getline(cin, POICategory);
