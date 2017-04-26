@@ -9,7 +9,7 @@
 #include "data_structures.hpp"
 #include "haversine_and_partition.hpp"
 #define MAX_PARTITIONS 5
-#define BOUNDARY_RANGE 0.05
+#define BOUNDARY_RANGE 0.1
 #define DISTANCE_QUERY_LIMIT 24
 
 using namespace std;
@@ -48,12 +48,12 @@ void applyRecommendationAlgo(vector<selectedPOI> POIs, int k)
     sort(unique.begin(), unique.end(), compareSelectedPOI);
     resultSize = min(k, (int) (unique.size()));
 
-    cout << "You have in total : " <<  resultSize << endl;// << " " << POIs[0].utility.utilities << endl;
+    cout << "You have in total : " <<  resultSize << endl;
     cout << "In increasing order of distance, they are at a distance of :" << endl;
     for(i = 0; i < resultSize; i++)
     {
-      cout << setprecision(15) << unique[i].utility.coordinate.latitude << " " << setprecision(15) << unique[i].utility.coordinate.longitude << " ";
-      cout << setprecision(15) << unique[i].distance << "km" << endl;
+      cout << setprecision(10) << unique[i].utility.coordinate.latitude << " " << setprecision(10) << unique[i].utility.coordinate.longitude << " " << unique[i].utility.utilities << " " << unique[i].utility.venue_id << " " ;
+      cout << setprecision(10) << unique[i].distance << "km" << endl;
     }
 }
 
@@ -67,7 +67,7 @@ void writeCoordinatesToFile(vector <selectedPOI> &wantedPOI)
     wantedPOISize = wantedPOI.size();
     for(i = 0; i < wantedPOISize; i++)
     {
-        fout << wantedPOI[i].utility.coordinate.latitude << "," << wantedPOI[i].utility.coordinate.longitude << endl;
+        fout << setprecision(10) << wantedPOI[i].utility.coordinate.latitude << "," << setprecision(10) << wantedPOI[i].utility.coordinate.longitude << endl;
         //cout << wantedPOI[i].utility.coordinate.latitude << "," << wantedPOI[i].utility.coordinate.longitude << endl;
     }
 
@@ -81,7 +81,7 @@ void writeUserCoordinatesToFile(Point userLocation)
 {
     ofstream fo;
     fo.open("userpoint.txt", ios::trunc);
-    fo << userLocation.latitude << "," << userLocation.longitude << endl;
+    fo << setprecision(10) << userLocation.latitude << "," << setprecision(10) << userLocation.longitude << endl;
     fo.close();
 }
 
@@ -126,73 +126,73 @@ Map locateUserPartition(Point userLocation, vector<Map>& grid)
 // Finds the relevant POIs for the user in the partition
 vector<selectedPOI> findPOIs(Map partition, string POICategory)
 {
-  // int i;
-  //  vector<selectedPOI> foundPOIs;
-  //  selectedPOI temp;
-  //
-  // int n = partition.noOfPOIs;
-  // int count = 0;
-  // for(i = 0; i < n; i++)
-  // {
-  //     if(partition.utility[i].utilities == POICategory)
-  //     {
-  //         temp.utility = partition.utility[i];
-  //         count++;
-  //         temp.distance = -1;
-  //         foundPOIs.push_back(temp);
-  //     }
-  // }
-  // return foundPOIs;
-    vector<selectedPOI> foundPOIs;
-    int comparision, mid, low, high, tempPos, stopBinarySearchFlag;
-    selectedPOI temp;
-    low = 0;
-    high = partition.noOfPOIs;
-    stopBinarySearchFlag = 0;
+  int i;
+   vector<selectedPOI> foundPOIs;
+   selectedPOI temp;
+  
+  int n = partition.noOfPOIs;
+  int count = 0;
+  for(i = 0; i < n; i++)
+  {
+      if(partition.utility[i].utilities == POICategory)
+      {
+          temp.utility = partition.utility[i];
+          count++;
+          temp.distance = -1;
+          foundPOIs.push_back(temp);
+      }
+  }
+  return foundPOIs;
+    // vector<selectedPOI> foundPOIs;
+    // int comparision, mid, low, high, tempPos, stopBinarySearchFlag;
+    // selectedPOI temp;
+    // low = 0;
+    // high = partition.noOfPOIs;
+    // stopBinarySearchFlag = 0;
 
-    while(low <= high)
-    {
-        if(stopBinarySearchFlag)
-            break;
+    // while(low <= high)
+    // {
+    //     if(stopBinarySearchFlag)
+    //         break;
 
-        mid = (low + high) / 2;
-        comparision = partition.utility[mid].utilities.compare(POICategory);
+    //     mid = (low + high) / 2;
+    //     comparision = partition.utility[mid].utilities.compare(POICategory);
 
-        // If both the strings are equal
-        if (comparision == 0)
-        {
-            tempPos = mid;
+    //     // If both the strings are equal
+    //     if (comparision == 0)
+    //     {
+    //         tempPos = mid;
 
-            // for the POIs lying in the current and below positions
-            while(tempPos >= 0 && !partition.utility[tempPos].utilities.compare(POICategory))
-            {
-                temp.utility = partition.utility[tempPos];
-                temp.distance = -1;
-                foundPOIs.push_back(temp);
-                tempPos--;
-            }
+    //         // for the POIs lying in the current and below positions
+    //         while(tempPos >= 0 && !partition.utility[tempPos].utilities.compare(POICategory))
+    //         {
+    //             temp.utility = partition.utility[tempPos];
+    //             temp.distance = -1;
+    //             foundPOIs.push_back(temp);
+    //             tempPos--;
+    //         }
 
-            // For dataRow lying above the mid position
-            tempPos = mid + 1;
-            while(tempPos < partition.noOfPOIs && !partition.utility[tempPos].utilities.compare(POICategory))
-            {
-                temp.utility = partition.utility[tempPos];
-                temp.distance = -1;
-                foundPOIs.push_back(temp);
-                tempPos++;
-            }
+    //         // For dataRow lying above the mid position
+    //         tempPos = mid + 1;
+    //         while(tempPos < partition.noOfPOIs && !partition.utility[tempPos].utilities.compare(POICategory))
+    //         {
+    //             temp.utility = partition.utility[tempPos];
+    //             temp.distance = -1;
+    //             foundPOIs.push_back(temp);
+    //             tempPos++;
+    //         }
 
-            stopBinarySearchFlag = 1;
-        }
+    //         stopBinarySearchFlag = 1;
+    //     }
 
-        else if (comparision < 0)
-            low = mid + 1;
-        else
-            high = mid - 1;
-     }
-    //Added since error was occuring "non-return type error".
-    //cout << "reached end" << endl;
-    return foundPOIs;
+    //     else if (comparision < 0)
+    //         low = mid + 1;
+    //     else
+    //         high = mid - 1;
+    //  }
+    // //Added since error was occuring "non-return type error".
+    // //cout << "reached end" << endl;
+    // return foundPOIs;
 }
 
 
@@ -223,8 +223,8 @@ void addPOIs(Map partition, vector<selectedPOI>& POIs, string POICategory, Point
         for(l = prev; l < userPOIsSize; l++)
             userPOIs[l].distance = distance[tempPos++];
 
-         for(i = 0; i < userPOIsSize; i++)
-             cout << userPOIs[i].distance << endl;
+         //for(i = 0; i < userPOIsSize; i++)
+             //cout << userPOIs[i].distance << endl;
         POIs.insert(POIs.end(), userPOIs.begin(), userPOIs.end());
 }
 
@@ -305,7 +305,7 @@ void find_K_NearestPOIs(Point userLocation, vector<Map> &originalGrid,  vector<M
               break;
         }
     }
-    cout << endl << "Partitioned recommendations" << endl;
+    cout << endl << "Entire recommendation algo recommendations" << endl;
     applyRecommendationAlgo(POIs, k);
 }
 
