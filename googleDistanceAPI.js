@@ -72,6 +72,7 @@ fs1.readFile('userpoint.txt', 'utf8', function(err, data) {
                         responseStr += chunk;
                     });
                     response.on("end", function() {
+                        console.log(responseStr);
                         var distanceObj = JSON.parse(responseStr);
                         //console.log(distanceObj.rows[0].elements);
 

@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <time.h>
 #include <iomanip>
+#include <thread>         // std::this_thread::sleep_for
+#include <chrono>
 #include "partitions_and_POIs.hpp"
 #include "partitioned_grids.hpp"
 #include "data_structures.hpp"
@@ -168,18 +170,21 @@ int main()
     t1 = clock() - t1;
     time_taken1 = ((double)t1) / CLOCKS_PER_SEC;
     cout << "Time taken by brute force: " << time_taken1<< endl;
+    this_thread::sleep_for (chrono::seconds(2));
 
     t2 = clock();
     find_K_NearestPOIs(userLocation,initialPartition_vec, topLeftShifted_vec, topRightShifted_vec, bottomLeftShifted_vec, bottomRightShifted_vec, k, POICategory);
     t2 = clock() - t2;
     time_taken2 = ((double)t2) / CLOCKS_PER_SEC;
     cout << "Time taken by the entire recommendation algorithm: " << time_taken2 << endl;
+    this_thread::sleep_for (chrono::seconds(2));
 
     t3 = clock();
     originalGrid_recommendation(userLocation, POICategory, initialPartition_vec, k);
     t3 = clock() - t3;
     time_taken3 = ((double)t3) / CLOCKS_PER_SEC;
     cout << "Time taken by the initial partition:  " << time_taken3 << endl;
+    this_thread::sleep_for (chrono::seconds(2));
 
     return 0;
 }
