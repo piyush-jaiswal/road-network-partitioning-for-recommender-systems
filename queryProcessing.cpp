@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <set>
 #include <iomanip>
+#include <thread>         // std::this_thread::sleep_for
+#include <chrono>
 #include "data_structures.hpp"
 #include "haversine_and_partition.hpp"
 #define MAX_PARTITIONS 5
@@ -38,6 +40,13 @@ bool operator<(const selectedPOI& a, const selectedPOI& b)
 
     return a.utility.coordinate.longitude < b.utility.coordinate.longitude;
 }
+
+
+// // Equality function
+// bool operator=(selectedPOI a, selectedPOI b)
+// {
+//     return a.utility.coordinate.longitude == b.utility.coordinate.longitude && a.utility.coordinate.latitude < b.utility.coordinate.latitude;
+// }
 
 
 void applyRecommendationAlgo(vector<selectedPOI> POIs, int k)
@@ -199,34 +208,77 @@ vector<selectedPOI> findPOIs(Map partition, string POICategory)
 // Adds the POIs in the 'partition' to the total list of relelevant 'POIs'
 void addPOIs(Map partition, vector<selectedPOI>& POIs, string POICategory, Point userLocation)
 {
-    int prev, j = 0, l, tempPos, userPOIsSize, i;
+    int prev, j = 0, l, tempPos, i, diffSize; //, userPOIsSize;
     vector<selectedPOI> userPOIs = findPOIs(partition, POICategory);
-    userPOIsSize = userPOIs.size();
+    
+    vector<selectedPOI> diff;
+    std::vector<selectedPOI>::iterator it;
+    sort(userPOIs.begin(), userPOIs.end());
+    sort(POIs.begin(), POIs.end());
+    set_difference(userPOIs.begin(), userPOIs.end(), POIs.begin(), POIs.end(), inserter(diff, diff.end()));
+
+    // userPOIsSize = userPOIs.size();
+    // prev = j;
+    // j += DISTANCE_QUERY_LIMIT;
+
+    //     while(j < userPOIsSize)
+    //     {
+    //         vector<selectedPOI> temp (userPOIs.begin() + prev, userPOIs.begin() + j);
+    //         vector<double> distance = get_distance(temp, userLocation);
+    //         tempPos = 0;
+    //          for(l = prev; l < j; l++)
+    //             userPOIs[l].distance = distance[tempPos++];
+
+    //         prev = j;
+    //         j += DISTANCE_QUERY_LIMIT;
+
+    //         //this_thread::sleep_for (chrono::seconds(2));
+    //     }
+
+    //     vector<selectedPOI> temp (userPOIs.begin() + prev, userPOIs.end());
+    //     vector<double> distance = get_distance(temp, userLocation);
+    //     tempPos = 0;
+    //     for(l = prev; l < userPOIsSize; l++)
+    //         userPOIs[l].distance = distance[tempPos++];
+
+    //      //for(i = 0; i < userPOIsSize; i++)
+    //          //cout << userPOIs[i].distance << endl;
+    //     POIs.insert(POIs.end(), userPOIs.begin(), userPOIs.end());
+
+    // Just calling from the difference of two vectors
+    diffSize = diff.size();
+    cout << "Diff size = " << diffSize << endl;
     prev = j;
     j += DISTANCE_QUERY_LIMIT;
 
-        while(j < userPOIsSize)
+        while(j < diffSize)
         {
-            vector<selectedPOI> temp (userPOIs.begin() + prev, userPOIs.begin() + j);
+            vector<selectedPOI> temp (diff.begin() + prev, diff.begin() + j);
             vector<double> distance = get_distance(temp, userLocation);
             tempPos = 0;
              for(l = prev; l < j; l++)
-                userPOIs[l].distance = distance[tempPos++];
+                diff[l].distance = distance[tempPos++];
 
             prev = j;
             j += DISTANCE_QUERY_LIMIT;
+
+            //this_thread::sleep_for (chrono::seconds(2));
         }
 
-        vector<selectedPOI> temp (userPOIs.begin() + prev, userPOIs.end());
-        vector<double> distance = get_distance(temp, userLocation);
-        tempPos = 0;
-        for(l = prev; l < userPOIsSize; l++)
-            userPOIs[l].distance = distance[tempPos++];
+        if(diffSize > 0)
+        {
+            vector<selectedPOI> temp (diff.begin() + prev, diff.end());
+            vector<double> distance = get_distance(temp, userLocation);
+            tempPos = 0;
+            for(l = prev; l < diffSize; l++)
+                diff[l].distance = distance[tempPos++];
+        }
 
          //for(i = 0; i < userPOIsSize; i++)
              //cout << userPOIs[i].distance << endl;
         POIs.insert(POIs.end(), userPOIs.begin(), userPOIs.end());
 }
+
 
 // This uses haversine distance
 bool satisfiesBoundaryCase(Point userLocation, Map initialPartition)
