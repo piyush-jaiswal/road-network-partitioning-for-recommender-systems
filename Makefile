@@ -2,7 +2,6 @@ compiler = g++ -std=c++11
 warning_flags = -Wall -Werror
 object_flag = -c
 executable_flag = -o
-profile_flag = -pg
 source_files_object = partitions_and_POIs_source.o partitioned_grids_source.o haversine_distance_source.o queryProcessing.o
 
 guide:

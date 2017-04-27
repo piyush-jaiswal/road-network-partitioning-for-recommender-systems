@@ -17,6 +17,8 @@
 using namespace std;
 
 
+void originalGrid_recommendation(Point, string, vector<Map>, int);
+
 typedef struct POIforUser
 {
     Data utility;
@@ -211,53 +213,26 @@ void addPOIs(Map partition, vector<selectedPOI>& POIs, string POICategory, Point
     int prev, j = 0, l, tempPos, i, diffSize, userPOIsSize;
     vector<selectedPOI> userPOIs = findPOIs(partition, POICategory);
     
-    // vector<selectedPOI> diff;
-    // sort(userPOIs.begin(), userPOIs.end());
-    // sort(POIs.begin(), POIs.end());
-    // set_difference(userPOIs.begin(), userPOIs.end(), POIs.begin(), POIs.end(), inserter(diff, diff.end()));
+    vector<selectedPOI> diff;
+    sort(userPOIs.begin(), userPOIs.end());
+    //sort(POIs.begin(), POIs.end());  Not sure whether to execute this or not
+    set_difference(userPOIs.begin(), userPOIs.end(), POIs.begin(), POIs.end(), inserter(diff, diff.end()));
+    
+    // cout << "Printing diff" << endl << endl;
+    // for(i = 0; i < (int) diff.size(); i++)
+    //     cout << diff[i].utility.utilities << endl;
 
-    userPOIsSize = userPOIs.size();
-    prev = j;
-    j += DISTANCE_QUERY_LIMIT;
-
-        while(j < userPOIsSize)
-        {
-            vector<selectedPOI> temp (userPOIs.begin() + prev, userPOIs.begin() + j);
-            vector<double> distance = get_distance(temp, userLocation);
-            tempPos = 0;
-             for(l = prev; l < j; l++)
-                userPOIs[l].distance = distance[tempPos++];
-
-            prev = j;
-            j += DISTANCE_QUERY_LIMIT;
-
-            //this_thread::sleep_for (chrono::seconds(2));
-        }
-
-        vector<selectedPOI> temp (userPOIs.begin() + prev, userPOIs.end());
-        vector<double> distance = get_distance(temp, userLocation);
-        tempPos = 0;
-        for(l = prev; l < userPOIsSize; l++)
-            userPOIs[l].distance = distance[tempPos++];
-
-         //for(i = 0; i < userPOIsSize; i++)
-             //cout << userPOIs[i].distance << endl;
-        POIs.insert(POIs.end(), userPOIs.begin(), userPOIs.end());
-
-
-    // Just calling from the difference of two vectors
-    // diffSize = diff.size();
-    // cout << "Diff size = " << diffSize << endl;
+    // userPOIsSize = userPOIs.size();
     // prev = j;
     // j += DISTANCE_QUERY_LIMIT;
 
-    //     while(j < diffSize)
+    //     while(j < userPOIsSize)
     //     {
-    //         vector<selectedPOI> temp (diff.begin() + prev, diff.begin() + j);
+    //         vector<selectedPOI> temp (userPOIs.begin() + prev, userPOIs.begin() + j);
     //         vector<double> distance = get_distance(temp, userLocation);
     //         tempPos = 0;
     //          for(l = prev; l < j; l++)
-    //             diff[l].distance = distance[tempPos++];
+    //             userPOIs[l].distance = distance[tempPos++];
 
     //         prev = j;
     //         j += DISTANCE_QUERY_LIMIT;
@@ -265,18 +240,47 @@ void addPOIs(Map partition, vector<selectedPOI>& POIs, string POICategory, Point
     //         //this_thread::sleep_for (chrono::seconds(2));
     //     }
 
-    //     if(diffSize > 0)
-    //     {
-    //         vector<selectedPOI> temp (diff.begin() + prev, diff.end());
-    //         vector<double> distance = get_distance(temp, userLocation);
-    //         tempPos = 0;
-    //         for(l = prev; l < diffSize; l++)
-    //             diff[l].distance = distance[tempPos++];
-    //     }
+    //     vector<selectedPOI> temp (userPOIs.begin() + prev, userPOIs.end());
+    //     vector<double> distance = get_distance(temp, userLocation);
+    //     tempPos = 0;
+    //     for(l = prev; l < userPOIsSize; l++)
+    //         userPOIs[l].distance = distance[tempPos++];
 
     //      //for(i = 0; i < userPOIsSize; i++)
     //          //cout << userPOIs[i].distance << endl;
     //     POIs.insert(POIs.end(), userPOIs.begin(), userPOIs.end());
+
+
+    // Just calling from the difference of two vectors
+    diffSize = diff.size();
+    cout << "Diff size = " << diffSize << endl;
+    prev = j;
+    j += DISTANCE_QUERY_LIMIT;
+
+        while(j < diffSize)
+        {
+            vector<selectedPOI> temp (diff.begin() + prev, diff.begin() + j);
+            vector<double> distance = get_distance(temp, userLocation);
+            tempPos = 0;
+             for(l = prev; l < j; l++)
+                diff[l].distance = distance[tempPos++];
+
+            prev = j;
+            j += DISTANCE_QUERY_LIMIT;
+
+            //this_thread::sleep_for (chrono::seconds(2));
+        }
+
+        if(diffSize > 0)
+        {
+            vector<selectedPOI> temp (diff.begin() + prev, diff.end());
+            vector<double> distance = get_distance(temp, userLocation);
+            tempPos = 0;
+            for(l = prev; l < diffSize; l++)
+                diff[l].distance = distance[tempPos++];
+        }
+
+    POIs.insert(POIs.end(), diff.begin(), diff.end());
 }
 
 
@@ -310,9 +314,27 @@ bool satisfiesBoundaryCase(Point userLocation, Map initialPartition)
     return hasRightBoundaryCase | hasLeftBoundaryCase | hasTopBoundaryCase | hasBottomBoundaryCase;
 }
 
+// Function to check if a user satisfies the middle case or not
+bool satisfiesMiddleCase(Point userLocation, Map initialPartition, int totalPartitionInRow)
+{
+    double latBoundaryRange, longBoundaryRange, distUserToMiddle;
+    Point midLocation;
+
+     // Separate for latitude and longitude because they are not exactly equal.
+    latBoundaryRange = distanceEarth(initialPartition.p_id.top_left, initialPartition.p_id.bottom_left) * BOUNDARY_RANGE;
+    longBoundaryRange = distanceEarth(initialPartition.p_id.top_right, initialPartition.p_id.top_left) * BOUNDARY_RANGE;
+
+    midLocation.latitude = initialPartition.p_id.top_left.latitude - getfactorLat(totalPartitionInRow) / 2;
+    midLocation.longitude = initialPartition.p_id.top_left.longitude + getfactorLong(totalPartitionInRow) / 2;
+
+    distUserToMiddle = distanceEarth(userLocation, midLocation);
+    return distUserToMiddle < latBoundaryRange && distUserToMiddle < longBoundaryRange;
+}
+
+
 //Function of our project
 void find_K_NearestPOIs(Point userLocation, vector<Map> &originalGrid,  vector<Map> &topLeftGrid,  vector<Map> &topRightGrid,
-                                                                        vector<Map> &bottomLeftGrid,  vector<Map> &bottomRightGrid, int k, string POICategory)
+                                                                        vector<Map> &bottomLeftGrid,  vector<Map> &bottomRightGrid, int k, string POICategory, int totalPartitionInRow)
 {
     int  i, acceptedPartitionSize, rejectedPartitionSize, poiSize;
     Map userPartitions[MAX_PARTITIONS];
@@ -320,6 +342,14 @@ void find_K_NearestPOIs(Point userLocation, vector<Map> &originalGrid,  vector<M
     vector<selectedPOI> POIs;
 
     userPartitions[0] = locateUserPartition(userLocation, originalGrid);
+
+    // If user is somewhere near the middle
+    if(satisfiesMiddleCase(userLocation, userPartitions[0], totalPartitionInRow))
+    {
+        originalGrid_recommendation(userLocation, POICategory, originalGrid, k);
+        return;
+    }
+
     userPartitions[1] = locateUserPartition(userLocation, topLeftGrid);
     userPartitions[2] = locateUserPartition(userLocation, topRightGrid);
     userPartitions[3] = locateUserPartition(userLocation, bottomLeftGrid);
@@ -340,8 +370,16 @@ void find_K_NearestPOIs(Point userLocation, vector<Map> &originalGrid,  vector<M
     acceptedPartitionSize = acceptedPartitions.size();
     rejectedPartitionSize = rejectedPartitions.size();
 
+    poiSize = POIs.size();
     for(i = 0; i < acceptedPartitionSize; i++)
+    {
         addPOIs(acceptedPartitions[i], POIs, POICategory, userLocation);
+
+        // optimizing for middle case scenario
+        poiSize = POIs.size();
+        if(poiSize >= k)
+              break;
+    }
 
     // If we do not have enough k then go in rejectedPartitions
     poiSize = POIs.size();

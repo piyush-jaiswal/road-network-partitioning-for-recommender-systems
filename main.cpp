@@ -173,7 +173,7 @@ int main()
     this_thread::sleep_for (chrono::seconds(2));
 
     t2 = clock();
-    find_K_NearestPOIs(userLocation,initialPartition_vec, topLeftShifted_vec, topRightShifted_vec, bottomLeftShifted_vec, bottomRightShifted_vec, k, POICategory);
+    find_K_NearestPOIs(userLocation,initialPartition_vec, topLeftShifted_vec, topRightShifted_vec, bottomLeftShifted_vec, bottomRightShifted_vec, k, POICategory, totalPartitionInRow);
     t2 = clock() - t2;
     time_taken2 = ((double)t2) / CLOCKS_PER_SEC;
     cout << "Time taken by the entire recommendation algorithm: " << time_taken2 << endl;

@@ -11,7 +11,7 @@ extern int getNoOfPOIs();
 extern std::vector<Data> loadPOI_inDataStructures();
 extern float getfactorLat(int);
 extern float getfactorLong(int);
-extern void find_K_NearestPOIs(Point, std::vector<Map>&, std::vector<Map>&, std::vector<Map>&, std::vector<Map>&, std::vector<Map>&, int , std::string);
+extern void find_K_NearestPOIs(Point, std::vector<Map>&, std::vector<Map>&, std::vector<Map>&, std::vector<Map>&, std::vector<Map>&, int , std::string, int);
 extern void brute_force(Point, std::string, Map, int);
 extern void originalGrid_recommendation(Point, std::string, std::vector<Map>, int);
 extern bool comparePOI(Data, Data);
