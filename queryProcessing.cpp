@@ -208,56 +208,25 @@ vector<selectedPOI> findPOIs(Map partition, string POICategory)
 // Adds the POIs in the 'partition' to the total list of relelevant 'POIs'
 void addPOIs(Map partition, vector<selectedPOI>& POIs, string POICategory, Point userLocation)
 {
-    int prev, j = 0, l, tempPos, i, diffSize; //, userPOIsSize;
+    int prev, j = 0, l, tempPos, i, diffSize, userPOIsSize;
     vector<selectedPOI> userPOIs = findPOIs(partition, POICategory);
     
-    vector<selectedPOI> diff;
-    std::vector<selectedPOI>::iterator it;
-    sort(userPOIs.begin(), userPOIs.end());
-    sort(POIs.begin(), POIs.end());
-    set_difference(userPOIs.begin(), userPOIs.end(), POIs.begin(), POIs.end(), inserter(diff, diff.end()));
+    // vector<selectedPOI> diff;
+    // sort(userPOIs.begin(), userPOIs.end());
+    // sort(POIs.begin(), POIs.end());
+    // set_difference(userPOIs.begin(), userPOIs.end(), POIs.begin(), POIs.end(), inserter(diff, diff.end()));
 
-    // userPOIsSize = userPOIs.size();
-    // prev = j;
-    // j += DISTANCE_QUERY_LIMIT;
-
-    //     while(j < userPOIsSize)
-    //     {
-    //         vector<selectedPOI> temp (userPOIs.begin() + prev, userPOIs.begin() + j);
-    //         vector<double> distance = get_distance(temp, userLocation);
-    //         tempPos = 0;
-    //          for(l = prev; l < j; l++)
-    //             userPOIs[l].distance = distance[tempPos++];
-
-    //         prev = j;
-    //         j += DISTANCE_QUERY_LIMIT;
-
-    //         //this_thread::sleep_for (chrono::seconds(2));
-    //     }
-
-    //     vector<selectedPOI> temp (userPOIs.begin() + prev, userPOIs.end());
-    //     vector<double> distance = get_distance(temp, userLocation);
-    //     tempPos = 0;
-    //     for(l = prev; l < userPOIsSize; l++)
-    //         userPOIs[l].distance = distance[tempPos++];
-
-    //      //for(i = 0; i < userPOIsSize; i++)
-    //          //cout << userPOIs[i].distance << endl;
-    //     POIs.insert(POIs.end(), userPOIs.begin(), userPOIs.end());
-
-    // Just calling from the difference of two vectors
-    diffSize = diff.size();
-    cout << "Diff size = " << diffSize << endl;
+    userPOIsSize = userPOIs.size();
     prev = j;
     j += DISTANCE_QUERY_LIMIT;
 
-        while(j < diffSize)
+        while(j < userPOIsSize)
         {
-            vector<selectedPOI> temp (diff.begin() + prev, diff.begin() + j);
+            vector<selectedPOI> temp (userPOIs.begin() + prev, userPOIs.begin() + j);
             vector<double> distance = get_distance(temp, userLocation);
             tempPos = 0;
              for(l = prev; l < j; l++)
-                diff[l].distance = distance[tempPos++];
+                userPOIs[l].distance = distance[tempPos++];
 
             prev = j;
             j += DISTANCE_QUERY_LIMIT;
@@ -265,18 +234,49 @@ void addPOIs(Map partition, vector<selectedPOI>& POIs, string POICategory, Point
             //this_thread::sleep_for (chrono::seconds(2));
         }
 
-        if(diffSize > 0)
-        {
-            vector<selectedPOI> temp (diff.begin() + prev, diff.end());
-            vector<double> distance = get_distance(temp, userLocation);
-            tempPos = 0;
-            for(l = prev; l < diffSize; l++)
-                diff[l].distance = distance[tempPos++];
-        }
+        vector<selectedPOI> temp (userPOIs.begin() + prev, userPOIs.end());
+        vector<double> distance = get_distance(temp, userLocation);
+        tempPos = 0;
+        for(l = prev; l < userPOIsSize; l++)
+            userPOIs[l].distance = distance[tempPos++];
 
          //for(i = 0; i < userPOIsSize; i++)
              //cout << userPOIs[i].distance << endl;
         POIs.insert(POIs.end(), userPOIs.begin(), userPOIs.end());
+
+
+    // Just calling from the difference of two vectors
+    // diffSize = diff.size();
+    // cout << "Diff size = " << diffSize << endl;
+    // prev = j;
+    // j += DISTANCE_QUERY_LIMIT;
+
+    //     while(j < diffSize)
+    //     {
+    //         vector<selectedPOI> temp (diff.begin() + prev, diff.begin() + j);
+    //         vector<double> distance = get_distance(temp, userLocation);
+    //         tempPos = 0;
+    //          for(l = prev; l < j; l++)
+    //             diff[l].distance = distance[tempPos++];
+
+    //         prev = j;
+    //         j += DISTANCE_QUERY_LIMIT;
+
+    //         //this_thread::sleep_for (chrono::seconds(2));
+    //     }
+
+    //     if(diffSize > 0)
+    //     {
+    //         vector<selectedPOI> temp (diff.begin() + prev, diff.end());
+    //         vector<double> distance = get_distance(temp, userLocation);
+    //         tempPos = 0;
+    //         for(l = prev; l < diffSize; l++)
+    //             diff[l].distance = distance[tempPos++];
+    //     }
+
+    //      //for(i = 0; i < userPOIsSize; i++)
+    //          //cout << userPOIs[i].distance << endl;
+    //     POIs.insert(POIs.end(), userPOIs.begin(), userPOIs.end());
 }
 
 
