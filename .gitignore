@@ -8,6 +8,9 @@
 !*/
 !Makefile
 
+# Ignore node modules
+node_modules
+
 ### Above combination will ignore all files without extension ###
 
 *.o
@@ -24,3 +27,4 @@
 coordinates.txt
 distances.txt
 userpoint.txt
+inp.txt
