@@ -2,6 +2,8 @@ var https = require('https');
 var fs = require('fs');
 var fs1 = require('fs');
 
+// Enter API key here
+var API_KEY = '';
 
 var origins = [];
 var units = 'metric';
@@ -10,6 +12,7 @@ var destinationUrl = "";
 var start = 0;
 var destinations = [];
 var originUrl = [];
+
 //reading origin from file where exactly the user lies.
 fs1.readFile('userpoint.txt', 'utf8', function(err, data) {
 
@@ -55,13 +58,12 @@ fs1.readFile('userpoint.txt', 'utf8', function(err, data) {
                 originUrl += origins[i].lat + "," + origins[i].long;
             }
 
-            // console.log(destinationUrl);
+            // console.log('https://maps.googleapis.com/maps/api/distancematrix/json?units=' + units + '&' + 'origins=' + originUrl + '&destinations=' + destinationUrl  + '&key=' + API_KEY);
             // console.log(origins);
 
             https.get({
-                    API_KEY: 'AIzaSyCiK9crxtqTJQU06x5InTzmGWQzpTcnsQY',
                     host: 'maps.googleapis.com',
-                    path: '/maps/api/distancematrix/json?units=' + units + '&' + 'origins=' + originUrl + '&destinations=' + destinationUrl
+                    path: '/maps/api/distancematrix/json?units=' + units + '&' + 'origins=' + originUrl + '&destinations=' + destinationUrl + '&key=' + API_KEY
                         // path: '/maps/api/distancematrix/json?origins=Vancouver+BC|Seattle&destinations=San+Francisco|Victoria+BC&mode=bicycling&language=fr-FR&key=AIzaSyAaMeRFOJn341xS5r4jskYaWH-Yw9qtoiQ'
                 }, function(response) {
                     // Continuously update stream with data
