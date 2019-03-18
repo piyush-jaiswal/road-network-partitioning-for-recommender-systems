@@ -77,7 +77,7 @@ int main()
     Map unpartitioned;
 
     //Taking the number of boxes in initial partition by the user
-    cout << "Enter the number of partitions :" << endl;
+    cout << "Enter the number of grids (Should be a perfect square) :" << endl;
     cin >> noOfSmallerPartitions;
 
     //A function to take number of rows in the dataset and memory allocation to the object array.
@@ -151,15 +151,15 @@ int main()
     //cout << unpartitioned.utility[0].utilities << endl;
 
     // Enter the query
-    cout << "Preprocessing complete. Waiting for query..." << endl;
+    cout << "Preprocessing complete. Enter the user latitude and longitude. Should be within (40.9883317193, -74.2747664452) and (40.5508524674, -73.6838251982)" << endl;
     cin >> userLocation.latitude;
     cin >> userLocation.longitude;
     //userLocation.latitude = getRandom(TOP_LEFT_LAT - LATITUDE_RANGE, TOP_LEFT_LAT);
     //userLocation.longitude = getRandom(TOP_LEFT_LONG, TOP_LEFT_LONG + LONGITUDE_RANGE);
     cout << "User coordinates: "; 
-    cout << setprecision(10) << userLocation.latitude << setprecision(10) << userLocation.longitude << endl;;
+    cout << setprecision(10) << userLocation.latitude <<  ", " << setprecision(10) << userLocation.longitude << endl;;
 
-    cout << "Enter the POI category" << endl;
+    cout << "Enter the POI category. (Airport, Bank, Park etc. Check dataset file for details)" << endl;
     cin.ignore();
     getline(cin, POICategory);
     cout << "Enter the no. of POIs wanted." << endl;
