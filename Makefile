@@ -11,7 +11,7 @@ compile: $(source_files_object)
 	$(compiler) $(warning_flags) $(executable_flag) main main.cpp $(source_files_object)
 
 run: compile main
-	./main < inp.txt
+	./main
 
 partitions_and_POIs_source.o:
 	$(compiler) $(object_flag) partitions_and_POIs_source.cpp
