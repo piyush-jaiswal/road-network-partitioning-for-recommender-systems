@@ -192,7 +192,7 @@ int getNoOfPOIs()
 {
     int count = 0;
     string str;
-    ifstream fin("unique.csv");
+    ifstream fin("data/unique.csv");
 
     while(!fin.eof())
     {
@@ -221,7 +221,7 @@ vector<Data> loadPOI_inDataStructures()
 {
     string temp;
     Data dataTemp;
-    ifstream file("unique.csv");
+    ifstream file("data/unique.csv");
     vector<Data> dataRow;
 
     while(file.good())
