@@ -1,4 +1,4 @@
-# road-network-partitioning-for-recommender-systems
+# Road Network Partitioning For Recommender Systems
 Road network partitioning scheme for faster queries in recommender systems.
 This project was part of the authors' R&D project during their undergraduate, under the guidance of [Prof. Prosenjit Gupta](https://sites.google.com/site/prosenjitgupta/).
 
